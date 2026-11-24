@@ -2,6 +2,13 @@
 
 スマートフォン向けの非公式OSS-DB Silver学習アプリ。HTML / CSS / JavaScriptのみで構成され、バックエンドやDBサーバーは不要。
 
+## v1.2 の変更
+- SQL実行ボタンでエンジンを自動起動。PostgreSQLが起動しない場合はSQLite（sql.js 1.13.0 asm.js、cdnjs）に切替。両者は別のDBで、文法・型・大小文字の挙動に違いがあります。起動不可の場合は解答チェック（SQL未実行）を表示します。
+- SQLはWeb Worker内で実行。タイムアウト時はWorkerを停止し、再起動できます。
+- ASCII全角文字を半角化、スマートクォートを変換、文末のコロンをセミコロンとして扱う。引用文字列の大小文字は維持し、PostgreSQLの :: キャストや文字列内のコロンは保持します。
+- 運用管理では練習問題のコマンドの大小文字を無視して採点・模擬実行します。本物のLinuxやpsqlでは区別される場合があります。
+- iPhone実機・実際のCDNからのエンジン起動は未確認。入力正規化の回帰テストを追加。
+
 ## v1.1 の変更
 - 起動できないHTMLプレビュー向けに案内を常時表示し、JS起動成功時に消します。
 - SQLの外部CDN起動に失敗した場合、解答チェックへ自動切替。手動でも選択可能。SQLは実行せず、模範解答のトークンを照合します（別解を不正解とする場合があります）。
@@ -16,7 +23,7 @@
 
 ## GitHub Pages で公開（無料の公開リポジトリ）
 1. GitHubにログインし、`ossdb-lab` などの名前でPublicリポジトリを作成。
-2. このZIPを解凍し、`index.html`, `style.css`, `lessons.js`, `simulator.js`, `sql-practice.js`, `app.js`, `icon.svg`, `icon.png`, `manifest.webmanifest`, `sw.js`, `README.md` をリポジトリのルートにアップロードしてコミット。
+2. このZIPを解凍し、`index.html`, `style.css`, `lessons.js`, `simulator.js`, `sql-practice.js`, `app.js`, `sql-worker.js`, `icon.svg`, `icon.png`, `manifest.webmanifest`, `sw.js`, `README.md` をリポジトリのルートにアップロードしてコミット。
 3. Settings → Pages → Build and deployment → Source: Deploy from a branch → main / (root) → Save。
 4. Pagesに表示されたURLをiPhoneのSafariで開く。共有 → ホーム画面に追加。
 
