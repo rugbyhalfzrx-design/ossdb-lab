@@ -1,11 +1,25 @@
 /* Stateful teaching simulator, NOT a real shell or PostgreSQL server. */
 window.AdminLab = class {
  constructor(task){this.reset(task)}
- reset(task){this.mode=task[6]||'shell';this.database='lab';this.running=task[7]!=='stopped';this.enabled=task[7]!=='disabled';this.pgdata=task[7]==='pgdata'?'/var/lib/postgresql/data':'';this.dbs=new Set(['postgres','lab','template0','template1']);this.files=new Set();this.roles=new Set(['postgres']);if(task[0]==='a42')this.roles.add('trainee');this.clusters=new Set(['/var/lib/postgresql/data']);if(['a15','a18','a19'].includes(task[0]))this.dbs.add('backup_lab');if(task[0]==='a18')this.files.add('lab.sql');if(task[0]==='a19')this.files.add('lab.dump');}
+ reset(task){this.taskId=task[0];this.mode=task[6]||'shell';this.database='lab';this.running=task[7]!=='stopped';this.enabled=task[7]!=='disabled';this.pgdata=task[7]==='pgdata'?'/var/lib/postgresql/data':'';this.dbs=new Set(['postgres','lab','template0','template1']);this.files=new Set();this.roles=new Set(['postgres']);if(task[0]==='a42')this.roles.add('trainee');this.settings={statement_timeout:'0'};this.grants=new Set();if(["a89","a90","a91","a92"].includes(task[0]))this.roles.add('appuser');this.clusters=new Set(['/var/lib/postgresql/data']);if(['a15','a18','a19'].includes(task[0]))this.dbs.add('backup_lab');if(task[0]==='a18')this.files.add('lab.sql');if(task[0]==='a19')this.files.add('lab.dump');}
  get prompt(){return this.mode==='psql'?`${this.database}=#`:'$'}
  normalize(s){return s.trim().replace(/\s+/g,' ').replace(/;$/,'').trim()}
  matches(input,task){const c=this.normalize(input),a=this.normalize(task[4]);const eq=(x,y)=>task[6]==='psql'&&!y.startsWith('\\')?x.toLowerCase()===y.toLowerCase():x===y;if(eq(c,a))return true;if(/^(?:sudo )?systemctl /.test(a)&&c.replace(/^sudo /,'')===a.replace(/^sudo /,''))return true;if(a.startsWith('pg_ctl -D ')&&c.startsWith('pg_ctl ')){const parse=s=>{const m=s.match(/^pg_ctl (?:(?:-D (\S+) (status|start|stop|reload|restart))|(?:(status|start|stop|reload|restart) -D (\S+)))(?: -m (smart|fast|immediate))?$/);return m?[(m[1]||m[4]),(m[2]||m[3]),m[5]||'fast'].join(' '):null};const p=parse(a);if(p&&p===parse(c))return true;}const alias={'pg_controldata /var/lib/postgresql/data':['pg_controldata -D /var/lib/postgresql/data'],'pg_resetwal -n /var/lib/postgresql/data':['pg_resetwal --dry-run /var/lib/postgresql/data','pg_resetwal -n -D /var/lib/postgresql/data'],'vacuumdb -d lab -z':['vacuumdb -z -d lab','vacuumdb -d lab --analyze'],'vacuumdb -d lab -t users':['vacuumdb -t users -d lab'],'pg_isready -p 5432':['pg_isready --port=5432'],'\\l':['\\list'],'\\q':['\\quit'],'\\c postgres':['\\connect postgres'],'psql -U postgres -d lab':['psql -d lab -U postgres','psql -U postgres lab'],'pg_dump -d lab -f lab.sql':['pg_dump lab -f lab.sql','pg_dump -f lab.sql lab','pg_dump lab > lab.sql'],'pg_dump -Fc -d lab -f lab.dump':['pg_dump -Fc lab -f lab.dump','pg_dump -F c -d lab -f lab.dump','pg_dump -d lab -Fc -f lab.dump'],'pg_ctl -D /var/lib/postgresql/data stop -m fast':['pg_ctl stop -D /var/lib/postgresql/data -m fast']};return (alias[a]||[]).some(x=>eq(c,x))}
  run(input){const c=this.normalize(input);let m;const ok=text=>({ok:true,text}),err=text=>({ok:false,text});if(!c)return err('');
+ const models=window.LESSONS.adminModels||{};const model=models[c]||Object.entries(models).find(([key,v])=>v.mode==='psql'&&!key.startsWith('\\')&&key.toLowerCase()===c.toLowerCase())?.[1];
+ if(model&&model.mode===this.mode&&(this.running||c==='psql --version')){
+ switch(model.effect){
+ case 'connect':this.mode='psql';this.database='lab';break;
+ case 'file':this.files.add(c.split(' ').at(-1));break;
+ case 'base':this.files.add('/tmp/basebackup');break;
+ case 'roleadd':if(this.roles.has('appuser'))return err('role already exists');this.roles.add('appuser');break;
+ case 'rolechange':if(!this.roles.has('appuser'))return err('role does not exist');break;
+ case 'roledrop':if(!this.roles.delete('appuser'))return err('role does not exist');break;
+ case 'grant':if(!this.roles.has('appuser'))return err('role does not exist');this.grants.add('appuser');break;
+ case 'revoke':if(!this.roles.has('appuser'))return err('role does not exist');this.grants.delete('appuser');break;
+ case 'setting':this.settings.statement_timeout=c.toLowerCase().startsWith('set ')?'5s':'0';break;
+ }return ok(model.text+'\n（単発コマンド演習・模擬出力）');}
+
  if(this.mode==='psql'){
   if(/^\\(?:q|quit)$/.test(c)){this.mode='shell';return ok('psql を終了しました。')}
   if(!this.running)return err('接続が切断されています。\\q で終了してください。');
