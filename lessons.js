@@ -26,7 +26,21 @@ admin: [
 ['a23','ANALYZE','usersテーブルの統計情報を更新してください。','ANALYZE テーブル名。','ANALYZE users;','ANALYZE は実行計画に使う統計情報を更新します。','psql'],
 ['a24','設定値確認','現在のport設定を確認してください。','SHOW パラメータ名。','SHOW port;','SHOW は実行中の設定値を確認します。','psql'],
 ['a25','設定ファイルの場所','postgresql.confのファイルパスを確認してください。','SHOW config_file。','SHOW config_file;','config_file は主設定ファイルの場所を示します。','psql'],
-['a26','接続認証ファイル','pg_hba.confのファイルパスを確認してください。','SHOW hba_file。','SHOW hba_file;','pg_hba.conf は接続元・DB・ユーザー・認証方式などを制御します。','psql']
+['a26','接続認証ファイル','pg_hba.confのファイルパスを確認してください。','SHOW hba_file。','SHOW hba_file;','pg_hba.conf は接続元・DB・ユーザー・認証方式などを制御します。','psql'],
+["a27","自動起動を有効化","Linux起動時にPostgreSQLが自動起動するよう設定してください（現在は無効）。","systemctl enable。","sudo systemctl enable postgresql","enable は次回以降の自動起動を設定するだけで、今すぐ起動するわけではありません。","shell","disabled"],
+["a28","自動起動を無効化","PostgreSQLのOS起動時の自動起動を無効にしてください。","systemctl disable。","sudo systemctl disable postgresql","disable は自動起動を解除します。現在稼働中のサーバーは停止しません。","shell"],
+["a29","自動起動設定の確認","PostgreSQLの自動起動設定が有効か確認してください。","systemctl is-enabled。","systemctl is-enabled postgresql","enabled は自動起動が有効、disabled は無効です。稼働状態とは別です。","shell"],
+["a30","Linuxサービスの起動","停止中のPostgreSQLサービスを今すぐ起動してください。","systemctl start。","sudo systemctl start postgresql","start は今すぐ起動します。自動起動設定は変更しません。","shell","stopped"],
+["a31","Linuxサービスの停止","稼働中のPostgreSQLサービスを今すぐ停止してください。","systemctl stop。","sudo systemctl stop postgresql","stop は今すぐ停止します。自動起動設定は変更しません。","shell"],
+["a32","Linuxサービスの状態確認","PostgreSQLサービスの現在の稼働状態を確認してください。","systemctl status。","systemctl status postgresql","status はサービスの現在の状態を表示します。","shell"],
+["a33","Linuxサービスの再起動","PostgreSQLサービスを再起動してください。","systemctl restart。","sudo systemctl restart postgresql","restart は停止と起動を行います。接続が切断されます。","shell"],
+["a34","Linuxサービスの再読み込み","停止せずPostgreSQLサービスの設定を再読み込みしてください。","systemctl reload。","sudo systemctl reload postgresql","reload は再起動不要の設定を反映します。","shell"],
+["a35","smart停止","/var/lib/postgresql/data のクラスタを、接続終了を待つ停止モードで停止してください。","pg_ctl stop -m smart。","pg_ctl -D /var/lib/postgresql/data stop -m smart","smart は既存接続がすべて終了するまで待ちます。模擬環境には他の接続がありません。","shell"],
+["a36","immediate停止","/var/lib/postgresql/data のクラスタを正常終了処理なしで即時停止してください。","pg_ctl stop -m immediate。","pg_ctl -D /var/lib/postgresql/data stop -m immediate","immediate は正常終了処理を省略し、次回起動時にクラッシュリカバリが必要です。緊急時向けです。","shell"],
+["a37","pg_ctl再起動","/var/lib/postgresql/data のクラスタをpg_ctlで再起動してください。","pg_ctl restart。","pg_ctl -D /var/lib/postgresql/data restart","restart は停止してから起動します。","shell"],
+["a38","PGDATA設定","データディレクトリ /var/lib/postgresql/data を環境変数PGDATAに設定してください。","export 変数名=値。","export PGDATA=/var/lib/postgresql/data","PGDATA はpg_ctlなどが参照する環境変数です。","shell"],
+["a39","PGDATA確認","設定済みのPGDATAの値を表示してください。","echo と $PGDATA。","echo $PGDATA","$PGDATA で環境変数の値を参照します。","shell","pgdata"],
+["a40","PGDATAを利用した状態確認","PGDATAは設定済みです。-Dを省略してpg_ctlで稼働状態を確認してください。","pg_ctl status。","pg_ctl status","PGDATAが設定済みなら-Dを省略できます。明示的な-Dが優先されます。","shell","pgdata"]
 ],
 sql:[
 ['s01','SELECT','usersの全列・全行を取得。','SELECT *','SELECT * FROM users;'],
