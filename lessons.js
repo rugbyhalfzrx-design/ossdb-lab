@@ -40,7 +40,18 @@ admin: [
 ["a37","pg_ctl再起動","/var/lib/postgresql/data のクラスタをpg_ctlで再起動してください。","pg_ctl restart。","pg_ctl -D /var/lib/postgresql/data restart","restart は停止してから起動します。","shell"],
 ["a38","PGDATA設定","データディレクトリ /var/lib/postgresql/data を環境変数PGDATAに設定してください。","export 変数名=値。","export PGDATA=/var/lib/postgresql/data","PGDATA はpg_ctlなどが参照する環境変数です。","shell"],
 ["a39","PGDATA確認","設定済みのPGDATAの値を表示してください。","echo と $PGDATA。","echo $PGDATA","$PGDATA で環境変数の値を参照します。","shell","pgdata"],
-["a40","PGDATAを利用した状態確認","PGDATAは設定済みです。-Dを省略してpg_ctlで稼働状態を確認してください。","pg_ctl status。","pg_ctl status","PGDATAが設定済みなら-Dを省略できます。明示的な-Dが優先されます。","shell","pgdata"]
+["a40","PGDATAを利用した状態確認","PGDATAは設定済みです。-Dを省略してpg_ctlで稼働状態を確認してください。","pg_ctl status。","pg_ctl status","PGDATAが設定済みなら-Dを省略できます。明示的な-Dが優先されます。","shell","pgdata"],
+["a41","ロール作成","ログイン可能な練習用ユーザー trainee を標準付属ツールで作成してください。","createuser ユーザー名。","createuser trainee","createuser は CREATE ROLE ... LOGIN に対応します。","shell"],
+["a42","ロール削除","練習用ユーザー trainee を標準付属ツールで削除してください。","dropuser ユーザー名。","dropuser trainee","dropuser は DROP ROLE に対応します。所有オブジェクトや依存関係に注意。","shell"],
+["a43","インストール情報","pg_config を使い、インストールされたPostgreSQLのバージョンを表示してください。","--version オプション。","pg_config --version","pg_config はインストール情報を表示するツール。稼働中のサーバーの設定を変更するものではありません。","shell"],
+["a44","クラスタ制御情報","/var/lib/postgresql/data のクラスタ制御情報を表示してください。","pg_controldata ディレクトリ。","pg_controldata /var/lib/postgresql/data","pg_controldata はチェックポイント、クラスタの状態、カタログバージョンなどの制御情報を表示します。","shell"],
+["a45","接続受付状態","PostgreSQLが接続を受け付けているか、ポート5432で確認してください。","pg_isready -p ポート番号。","pg_isready -p 5432","pg_isready は接続受付状態を調べます。終了コード0は受付中、1は拒否中、2は応答なし、3は試行なしです。","shell"],
+["a46","WALリセットの事前確認","停止中のクラスタ /var/lib/postgresql/data に対して、pg_resetwal が行う変更を実際には行わず確認してください。","-n（--dry-run）を付けます。","pg_resetwal -n /var/lib/postgresql/data","pg_resetwal は破損時の最後の手段。-n は変更しません。通常運用でのWALリセットや強制実行は避けます。","shell","stopped"],
+["a47","vacuumdb","Linuxシェルからlab DBのusersテーブルをVACUUMしてください。","vacuumdb -d DB名 -t テーブル名。","vacuumdb -d lab -t users","vacuumdb はSQLの VACUUM を実行する標準ツールです。","shell"],
+["a48","vacuumdbと統計更新","lab DBをVACUUMし、同時に統計情報を更新してください。","vacuumdb -z（--analyze）。","vacuumdb -d lab -z","-z は VACUUM ANALYZE に対応します。","shell"],
+["a49","起動ログの出力","停止中のクラスタ /var/lib/postgresql/data を、ログを server.log に出力して起動してください。","pg_ctl の -l ファイル名。","pg_ctl -D /var/lib/postgresql/data -l server.log start","-l（小文字のL）はサーバーのログ出力ファイルを指定します。","shell","stopped"],
+["a50","起動完了を待つ","停止中のクラスタ /var/lib/postgresql/data を、完了を待機するオプションを明示して起動してください。","pg_ctl -w。","pg_ctl -D /var/lib/postgresql/data -w start","-w は操作完了を待つ指定で、現行版では通常デフォルトです。-W は待ちません。","shell","stopped"],
+["a51","待機時間の指定","停止中のクラスタ /var/lib/postgresql/data を、待機時間の上限を30秒に指定して起動してください。","pg_ctl -t 秒数。","pg_ctl -D /var/lib/postgresql/data -t 30 start","-t は完了待ちのタイムアウト（秒）。タイムアウトしても処理が継続する場合があります。","shell","stopped"]
 ],
 sql:[
 ['s01','SELECT','usersの全列・全行を取得。','SELECT *','SELECT * FROM users;'],
@@ -82,7 +93,20 @@ quiz:[
 ['q15','MVCC','MVCCの説明として適切なのは？',['行の複数バージョンを利用し、可視性を制御する','全検索が常に排他ロックを取る','DBの全コピーを毎秒作る','インデックスを禁止する'],0,'MVCCは同時実行性を高める仕組みです。'],
 ['q16','停止モード','pg_ctl stop -m fast の動作は？',['新規接続を許可し続ける','接続終了を無期限に待つ','接続を切断し未完了トランザクションをロールバックして停止','即時停止して正常停止処理を省く'],2,'fastは正常停止の一種。immediateとは異なります。'],
 ['q17','インデックス','一般的な等価・範囲検索で利用されるデフォルトのインデックス方式は？',['GIN','BRIN','B-tree','GiST'],2,'CREATE INDEXのデフォルトはB-treeです。'],
-['q18','外部キー','外部キーが主に保証するものは？',['参照整合性','列の暗号化','必ず高速な検索','テーブルの自動削除'],0,'外部キーは参照先との整合性を保証します。']
+['q18','外部キー','外部キーが主に保証するものは？',['参照整合性','列の暗号化','必ず高速な検索','テーブルの自動削除'],0,'外部キーは参照先との整合性を保証します。'],
+["q19","標準付属ツール","pg_config の主な役割は？",["サーバー設定を書き換える","インストールされたPostgreSQLの構築情報を表示する","WALをリセットする","接続を切断する"],1,"pg_config はインストール情報を表示します。設定変更は行いません。"],
+["q20","標準付属ツール","pg_controldata で確認できる情報は？",["SQLの実行結果","ユーザーの平文パスワード","クラスタの制御情報","アプリのソースコード"],2,"クラスタの状態やチェックポイントなどの制御情報を確認できます。"],
+["q21","標準付属ツール","pg_isready の終了コード0は何を示す？",["接続受付中","応答なし","接続拒否中","試行なし"],0,"0は受付中、1は拒否中、2は応答なし、3は試行なしです。"],
+["q22","標準付属ツール","pg_resetwal の適切な用途は？",["定期バックアップ","通常のログ整理","毎回の起動前の初期化","WAL等の破損で起動できないときの最後の手段"],3,"安易なリセットはデータ不整合につながります。-n は変更を行わない確認用です。"],
+["q23","ロール管理","createuser に相当するSQLは？",["CREATE TABLE","CREATE ROLE ... LOGIN","CREATE DATABASE","GRANT SELECT"],1,"createuser はログイン可能なロールを作成するツールです。"],
+["q24","pg_ctlオプション","pg_ctl の -l、-w、-t の組合せとして正しいのは？",["ログ出力先・完了待機・待機上限秒数","ログ出力先・即時停止・テーブル名","DB名・待機なし・ログ出力先","ユーザー名・WAL削除・ポート番号"],0,"-l はログファイル、-w は待機、-t は待機時間上限を指定します。"],
+["q25","VACUUM","vacuumdb -z の動作は？",["VACUUMをせずANALYZEのみ","WAL削除","VACUUMとANALYZE","必ずVACUUM FULL"],2,"-z はVACUUMに加えてANALYZEを実行します。"],
+["q26","PGDATA","PGDATA設定済みで pg_ctl -D /other status を実行すると、どちらが優先される？",["PGDATA","-D の /other","両方のクラスタ","必ずエラー"],1,"明示的な -D が優先されます。"]
 ],
 seed:`CREATE TABLE users (id integer PRIMARY KEY, name text NOT NULL, age integer, dept text, email text); CREATE TABLE orders (id integer PRIMARY KEY, user_id integer REFERENCES users(id), amount integer); INSERT INTO users VALUES (1,'Sato',31,'IT','sato@example.test'),(2,'Suzuki',25,'IT',NULL),(3,'Tanaka',40,'Sales','tanaka@example.test'),(4,'Yamada',35,'Sales',NULL),(5,'Kato',22,'HR','kato@example.test'); INSERT INTO orders VALUES (1,1,1200),(2,1,800),(3,2,500),(4,3,3000),(5,4,1500);`
 };
+
+/* 出題区分：公式FAQではSilverにOS依存の問題は出題されない。 */
+window.LESSONS.adminScope=Object.fromEntries(Array.from({length:8},(_,i)=>['a'+(27+i),'試験範囲外・実務向け']));
+window.LESSONS.adminScope.a38='関連知識：シェル操作自体は範囲外';
+window.LESSONS.adminScope.a39='関連知識：シェル操作自体は範囲外';
