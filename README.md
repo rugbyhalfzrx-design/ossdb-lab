@@ -1,0 +1,69 @@
+# OSS-DB Lab / Silver
+
+スマートフォン向けの非公式OSS-DB Silver学習アプリ。HTML / CSS / JavaScriptのみで構成され、バックエンドやDBサーバーは不要。
+
+## v1.1 の変更
+- 起動できないHTMLプレビュー向けに案内を常時表示し、JS起動成功時に消します。
+- SQLの外部CDN起動に失敗した場合、解答チェックへ自動切替。手動でも選択可能。SQLは実行せず、模範解答のトークンを照合します（別解を不正解とする場合があります）。
+- HTTPS公開版はService Workerで基本ファイルを保存し、初回の保存成功後にオフライン利用できる設計です。SQL実行エンジンはキャッシュ対象外。iPhoneのストレージ削除などで再取得が必要な場合があります。
+
+## 使い方
+- 運用管理：26問。Linuxシェルとpsqlを切り替える模擬ターミナルです。課題を切り替えると環境を初期化します。実際のOS、ファイル、PostgreSQLサーバーにアクセスしません。対応コマンドと代表的なオプションのみ実装しています。
+- SQL実践：20問。PGlite 0.3.14（WebAssembly PostgreSQL）をjsDelivr CDNから読み込み、端末のメモリ内でSQLを実行します。初回起動には通信が必要です。問題選択・DB初期化で練習データを再作成します。実際のPostgreSQLと異なり、複数接続・サーバー管理等は対象外です。採点は練習データ上の結果照合であり、任意のSQLの意味的同値性を保証しません。複数列に同じ名前を使うSQLは採点が不正確なことがあります。
+- 確認問題：18問。各問に解説があります。
+- 早見表：検索可能。
+- 進捗：localStorageに正解済みIDを記録（同じブラウザ・同じ公開URL）。データベースとターミナル状態は再読込で消えます。
+
+## GitHub Pages で公開（無料の公開リポジトリ）
+1. GitHubにログインし、`ossdb-lab` などの名前でPublicリポジトリを作成。
+2. このZIPを解凍し、`index.html`, `style.css`, `lessons.js`, `simulator.js`, `sql-practice.js`, `app.js`, `icon.svg`, `icon.png`, `manifest.webmanifest`, `sw.js`, `README.md` をリポジトリのルートにアップロードしてコミット。
+3. Settings → Pages → Build and deployment → Source: Deploy from a branch → main / (root) → Save。
+4. Pagesに表示されたURLをiPhoneのSafariで開く。共有 → ホーム画面に追加。
+
+静的ホスティングなので、EC2・RDSなどの契約は不要。リポジトリのソースは公開されるため、パスワード・本番DB情報・業務データを入れないでください。
+
+ローカル確認：フォルダで `python -m http.server 8000` を実行し、PCのブラウザで http://localhost:8000 を開きます。単体HTML版も提供していますが、iPhoneの「ファイル」アプリによるHTMLプレビューではJavaScriptが実行されないことがあるためPagesを推奨。
+
+## 改修する場所
+| ファイル | 役割 |
+|---|---|
+| index.html | 画面の構造 |
+| style.css | UI・スマホ表示 |
+| lessons.js | 問題・ヒント・解答・SQL初期データ |
+| simulator.js | 模擬ターミナルの実行ルールと状態管理 |
+| sql-practice.js | 通信不要の模範解答照合（SQL実行なし） |
+| sw.js / manifest.webmanifest | オフライン保存・Webアプリ設定 |
+| app.js | UI、採点、進捗、PGlite接続 |
+| icon.svg / icon.png | アイコン |
+| tests/simulator.test.js | 全模範コマンドと基本状態遷移のテスト |
+| build.py | 単体HTML版を生成（標準ライブラリのみ） |
+
+問題データは配列で管理。新規問題には重複しないIDを付ける。既存IDは進捗に使われるので変更しない。
+
+- `admin`: `[id, タイトル, 問題, ヒント, 解答コマンド, 解説, 'shell' または 'psql', オプション初期状態]`。新コマンドを追加する際は simulator.js の run / matches も実装。
+- `sql`: `[id, タイトル, 問題, ヒント, 模範SQL, 順序を採点するか, 更新・DDL検証SQL(任意), 追加検証種別(任意)]`。
+- `quiz`: `[id, タイトル, 問題, 選択肢配列, 正解の0始まりインデックス, 解説]`。
+
+```js
+['q19','設定','標準ポート番号は？',['3306','5432','8080','443'],1,'PostgreSQLのデフォルトは5432。']
+```
+
+## テストとビルド
+```sh
+node --check app.js
+node tests/simulator.test.js
+python build.py
+```
+単体HTML版は `ossdb-lab.html` として生成されます。分割版を改修した後に再生成してください。
+
+## 既知の制限
+管理コマンドは模擬。実機iPhone上での動作検証、およびCDNからPGliteをロードしてSQLを実行する結合試験は、この作成環境では未実施です。SQLは外部CDNに依存します。基本機能のPWAキャッシュは追加しましたが実機でのオフライン再起動は未検証です。同期・ログイン機能は未実装。
+
+## 参考資料
+- 公式試験範囲 https://oss-db.jp/outline/silver
+- PostgreSQL 16 マニュアル https://www.postgresql.org/docs/16/
+- PGlite https://pglite.dev/docs/
+- GitHub Pages https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+
+## v1.1 検証結果
+Chromiumの390pxモバイル幅で単体HTMLを読み込み、管理26問、解答チェック20問、確認18問の模範解答と、CDN読み込み失敗時の切替、早見表検索を確認。進捗書き込みは模擬localStorageで確認。JS実行時エラーなし。実際の永続化、Service Workerのキャッシュ動作、iPhone実機、本物のPGlite起動は未検証。
