@@ -1,0 +1,2 @@
+/* Conservative exact-token comparison. Not a SQL parser or execution engine. */
+(()=>{'use strict';function tokens(s){const re=/'(?:''|[^'])*'|"(?:""|[^"])*"|[a-zA-Z_][a-zA-Z_0-9]*|\d+(?:\.\d+)?|>=|<=|<>|!=|[^\s]/g;const ts=(s.match(re)||[]).map(t=>/^[a-zA-Z_]/.test(t)?t.toLowerCase():t);while(ts.at(-1)===';')ts.pop();return ts}window.SQLPractice={matches:(a,b)=>JSON.stringify(tokens(a))===JSON.stringify(tokens(b))};})();
