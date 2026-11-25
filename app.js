@@ -16,9 +16,9 @@ function progress(){const groups=['admin','sql','quiz'];const counts=groups.map(
 function mark(id){done.add(id);try{localStorage.setItem(KEY,JSON.stringify([...done]))}catch{}progress()}
 function msg(id,text='',ok){const e=$(id);e.textContent=text;e.className='feedback'+(text&&ok!==undefined?(ok?' ok':' bad'):'')}
 function current(g){return L[g][Number($(g+'Select').value)||0]}
-function setupSelect(g){const s=$(g+'Select');L[g].forEach((t,i)=>{const o=document.createElement('option');o.value=i;o.textContent=t[1];s.append(o)});s.value=String(Math.max(0,L[g].findIndex(t=>!done.has(t[0]))))}
+function setupSelect(g){const s=$(g+'Select');let chapter='',group=s;L[g].forEach((t,i)=>{const label=L.chapters?.[g]?.[t[0]]||'';if(label&&label!==chapter){group=document.createElement('optgroup');group.label=label;s.append(group);chapter=label}const o=document.createElement('option');o.value=i;o.textContent=t[1];group.append(o)});s.value=String(Math.max(0,L[g].findIndex(t=>!done.has(t[0]))))}
 function next(g){const s=$(g+'Select');s.value=(Number(s.value)+1)%L[g].length;s.dispatchEvent(new Event('change'))}
-function taskText(id,t,sub){const e=$(id);e.textContent=t[2];if(sub){const x=document.createElement('small');x.textContent=sub;e.append(x)}}
+function taskText(id,t,sub){const e=$(id);e.textContent=t[2];const g=id.replace(/Task$/,'');const chapter=L.chapters?.[g]?.[t[0]];if(chapter||sub){const x=document.createElement('small');x.textContent=[chapter,sub].filter(Boolean).join(' / ');e.append(x)}}
 function help(g,answer){const t=current(g),e=$(g+'Help');e.hidden=false;e.textContent=(answer?'解答：'+t[4]+(g==='admin'?'\n'+t[5]:''):'ヒント：'+t[3]);}
 for(const g of ['admin','sql','quiz'])setupSelect(g);for(const g of ['admin','sql']){ $(g+'Hint').onclick=()=>help(g,false);$(g+'Answer').onclick=()=>help(g,true);$(g+'Next').onclick=()=>next(g)}
 for(const b of document.querySelectorAll('nav button'))b.onclick=()=>{for(const x of document.querySelectorAll('nav button')){x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',x===b?'true':'false');$(x.dataset.tab).hidden=x!==b}};
@@ -42,7 +42,7 @@ $('mockStart').onclick=startMock;$('mockRestart').onclick=startMock;$('mockPrev'
 function refs(){const q=$('searchRef').value.toLowerCase().trim(),e=$('refList');e.replaceChildren();const extra=[['postgresql.conf','サーバー設定。shared_buffers、port など。'],['pg_hba.conf','クライアント認証。接続元・DB・ユーザー・認証方式。'],['pg_ident.conf','OSユーザー名とDBユーザー名のマッピング。'],['WAL','Write-Ahead Logging。データページより先にログを永続化。'],['\\d','リレーション一覧（テーブル・ビュー・シーケンス等）。'],['VACUUM FULL','テーブルを書き直し、領域をOSへ返せる。排他ロックに注意。'],['SELECT nextval(\'users_id_seq\');','シーケンスを進めて値を取得。実際のシーケンス名を指定。']];const rows=[...L.admin.map(t=>[t[4],t[1]+' / '+t[5]+(scope(t)?' / '+scope(t):''),t[6]]),...extra];for(const r of rows){if(!r.join(' ').toLowerCase().includes(q))continue;const d=document.createElement('div');d.className='refItem';const c=document.createElement('code');c.textContent=r[0];const s=document.createElement('small');s.textContent=(r[2]?r[2]+' · ':'')+r[1];d.append(c,s);e.append(d)}if(!e.children.length)e.textContent='該当するコマンドがありません。'}$('searchRef').oninput=refs;
 // SQL runs in a dedicated worker, keeping the mobile UI responsive.
 function setBusy(v){locked=v;$('runSQL').disabled=v;$('resetSQL').disabled=v||!(sqlLoaded||practice);$('practiceSQL').disabled=v;$('sqlSelect').disabled=v;$('sqlNext').disabled=v;$('connect').disabled=v;$('sqliteConnect').disabled=v}
-function createClient(){const worker=new Worker('./sql-worker.js?v=2.0');let seq=0,pending=new Map(),closed=false;
+function createClient(){const worker=new Worker('./sql-worker.js?v=2.1');let seq=0,pending=new Map(),closed=false;
  function fail(reason){if(closed)return;closed=true;worker.terminate();for(const p of pending.values()){clearTimeout(p.timer);p.reject(new Error(reason))}pending.clear()}
  worker.onmessage=e=>{const m=e.data,p=pending.get(m.id);if(!p)return;pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(new Error(m.error)):p.resolve(m.result)};
  worker.onerror=e=>fail(e.message||'SQLワーカーの起動に失敗');
