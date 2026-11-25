@@ -16,7 +16,7 @@ assert(service.run('pg_ctl stop -m immediate').ok);assert.equal(service.running,
 
 const extended=new AdminLab(LESSONS.admin.find(t=>t[0]==='a01'));
 assert(extended.run('createuser trainee').ok);assert(extended.roles.has('trainee'));assert(extended.run('dropuser trainee').ok);assert(!extended.roles.has('trainee'));
-assert(extended.run('pg_isready -p 5432').text.includes('exit: 0'));assert(extended.run('pg_ctl -D /var/lib/postgresql/data stop').ok);assert(extended.run('pg_isready -p 5432').text.includes('exit: 2'));
+assert(extended.run('pg_isready -p 5432').notes.some(x=>x.includes('終了コード: 0')));assert(extended.run('pg_ctl -D /var/lib/postgresql/data stop').ok);assert(extended.run('pg_isready -p 5432').notes.some(x=>x.includes('終了コード: 2')));
 assert(!extended.run('pg_resetwal -f /var/lib/postgresql/data').ok);assert(extended.run('pg_resetwal -n /var/lib/postgresql/data').ok);
 assert(extended.run('pg_ctl -D /var/lib/postgresql/data -l server.log start').ok);assert(extended.files.has('server.log'));
 assert.equal(Object.keys(LESSONS.adminScope).length,13);

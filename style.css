@@ -9,3 +9,6 @@ nav{grid-template-columns:repeat(5,minmax(0,1fr))}nav button{font-size:12px}.opt
 .next-bottom{display:block;width:100%;margin:12px 0 0;min-height:48px;font-size:15px}
 
 .option-heading{font-size:16px;margin:16px 0 4px;padding:8px 10px;background:#e6edf5;border-radius:8px}.option-entry{padding:12px 4px;border-bottom:1px solid var(--line)}.option-entry strong{display:block;font-size:15px;color:var(--blue)}.option-entry small{display:block;color:var(--muted);font:12px monospace}.option-entry p{margin:6px 0;font-size:14px;color:var(--ink)}.option-entry code{display:block;background:#f1f5f9;padding:8px;border-radius:7px;font-size:13px;overflow-wrap:anywhere;white-space:pre-wrap}.option-entry small:empty{display:none}
+
+/* Terminal transcript: raw output and optional teaching notes */
+#terminalLog{height:290px;white-space:pre;overflow:auto;overflow-wrap:normal;tab-size:4}.terminal-output,.terminal-note{display:block;min-width:max-content}.terminal-note{color:#83d8b9;white-space:pre-wrap;overflow-wrap:anywhere;min-width:0;margin:4px 0}.term-controls{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}.term-controls button[aria-pressed=true]{background:#245a53;color:#d5fff2}#prompt{max-width:45%;overflow-wrap:anywhere;white-space:normal;flex-shrink:0}
