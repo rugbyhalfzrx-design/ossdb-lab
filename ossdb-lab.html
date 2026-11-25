@@ -4,15 +4,18 @@
 .startup-notice{background:#fff3d2;border:1px solid #e2bf62;border-radius:10px;padding:12px;margin-bottom:12px;font-size:14px} .startup-notice[hidden]{display:none!important} .actions button{min-height:44px} input,textarea,select{font-size:16px} .feedback{overflow-wrap:anywhere}
 nav{grid-template-columns:repeat(5,minmax(0,1fr))}nav button{font-size:12px}.options button.selected{background:#e1edff;border-color:#235caa;color:#123f7a}.options button.correct{background:#e3f4f0;border-color:#087c70;color:#07594d}.options button.wrong{background:#fff0ed;border-color:#b44336;color:#85291d}.options button:disabled{opacity:1}#accuracy,#quizReviewCount{line-height:1.7}#mockReview details{white-space:normal}#mockReview pre{margin-top:8px}.actions small{align-self:center;color:var(--muted)}
 
+/* v2.4 command blocks */
+.block-tool{margin:12px 0;border:1px solid var(--line);border-radius:12px;padding:10px;background:#f8fafc}.block-mode{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:#e6edf5;padding:3px;border-radius:11px}.block-mode button{background:transparent;border:0;color:var(--muted);font-size:13px;min-height:40px}.block-mode button[aria-pressed="true"]{background:white;color:var(--blue);box-shadow:0 1px 4px #173b5220}.block-tool p{margin:9px 0;font-size:12px}.block-caption{font-size:12px;color:var(--muted);font-weight:700;margin:8px 0 4px}.block-bank,.block-selected{display:flex;flex-wrap:wrap;gap:6px;min-height:43px}.block-selected{border:1px dashed #b3c5d6;padding:6px;border-radius:9px;background:white}.word-block,.chosen-block{font:13px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;min-height:44px;max-width:100%;overflow-wrap:anywhere;text-align:left;white-space:pre-wrap;border:1px solid #b8cde5;background:white;color:#1a4a7f;padding:8px 10px}.chosen-block{background:#dff3ef;border-color:#8acfc0;color:#08695d}.block-empty{font-size:12px;color:var(--muted);align-self:center}.explanation{margin-top:12px;padding:14px;border:1px solid #c9dce9;border-radius:12px;background:#f2f7fc;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8}.refItem small{white-space:pre-wrap}
+
 </style></head><body>
 <header><div class="brand"><span class="logo">DB</span><div><small>POSTGRESQL / SILVER</small><h1>OSS-DB Lab</h1></div></div><button id="resetProgress" class="ghost small">記録リセット</button></header>
 <main><div id="startupNotice" class="startup-notice">この画面が消えない場合はJavaScriptが動いていません。ファイルのプレビューではなく、GitHub Pagesで公開したURLをSafariで開いてください。</div><section class="hero"><div class="eyebrow">YOUR STUDY PROGRESS</div><div class="heroLine"><h2 id="progressText">0 / 0</h2><span id="percent">0%</span></div><div class="track"><div id="bar"></div></div><p id="progressDetail"></p></section>
 <nav aria-label="学習モード"><button data-tab="admin" class="active">運用管理</button><button data-tab="sql">SQL実践</button><button data-tab="quiz">確認問題</button><button data-tab="mock">50問模試</button><button data-tab="ref">早見表</button></nav>
-<section id="admin" class="panel"><div class="sectionHead"><div><div class="eyebrow">01 / ADMIN LAB</div><h2>運用管理ターミナル</h2></div><span class="tag">模擬環境</span></div><p>Linux・psqlの操作を安全に練習。実際のサーバーやファイルは変更しません。Linuxコマンドとオプション、psqlメタコマンドは大文字・小文字を区別します。</p><p>「試験範囲外・実務向け」はOS固有の操作です。「関連知識」は試験用語に関連する補足です。すべて練習・進捗記録できます。</p><p>上から順に学習すると、環境確認→起動→接続→確認→運用→バックアップ→停止の流れを練習できます。lab DBは準備済みで、課題ごとに環境が初期化されます。systemctlはpg_ctlとは別のOSサービス管理方法です。</p><div class="controls"><label for="adminSelect">練習する課題</label><select id="adminSelect"></select></div><div class="task"><div id="adminTask"></div><div class="actions"><button id="adminHint" class="ghost">ヒント</button><button id="adminAnswer" class="ghost">解答を見る</button><button id="adminNext" class="ghost">次の課題 ›</button><button id="adminRandom" class="ghost">ランダム</button><button id="adminWrong" class="ghost">間違い復習</button><small id="adminReviewCount"></small></div><div id="adminHelp" class="help" hidden></div></div><div class="terminal"><div class="termhead"><span>● ● ●</span><span>postgres@lab</span><button id="clearTerm">表示クリア</button></div><pre id="terminalLog" aria-live="polite"></pre><form id="commandForm"><label id="prompt" for="command">$</label><input id="command" placeholder="コマンドを入力" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go"><button type="submit">実行</button></form></div><div class="actions shortcuts"><button data-insert="\\">\</button><button data-insert=";">;</button><button data-insert="-">-</button><button data-insert="/">/</button><button id="lastCommand">履歴 ↑</button><button id="resetLab" class="ghost">環境リセット</button></div><div id="adminFeedback" class="feedback" aria-live="polite"></div></section>
-<section id="sql" class="panel" hidden><div class="sectionHead"><div><div class="eyebrow">02 / SQL LAB</div><h2>PostgreSQL 実践</h2></div><span class="tag" id="sqlStatus">実行で起動</span></div><p>SQLを入力して実行すると自動起動します。PostgreSQL優先、起動失敗時はSQLite（文法に一部違いあり）。初回は通信が必要です。既存の練習用テーブルで検索を覚えた後、DDL・データ更新・トランザクションへ進みます。課題ごとにデータは初期化されます。全角・半角、SQLキーワードの大小文字は同じ扱いです。コロン「:」はセミコロン「;」の代用にはなりません。文字列の大小文字は区別します。</p><div class="actions"><button id="connect" class="primary">PostgreSQLを起動</button><button id="sqliteConnect" class="ghost">SQLiteで起動</button><button id="practiceSQL" class="ghost">解答チェック（通信不要）</button></div><div id="sqlError" class="feedback" aria-live="polite"></div><details><summary>練習用テーブル・初期データ</summary><div id="schema"></div></details><label for="sqlSelect">練習する課題</label><select id="sqlSelect"></select><div class="task"><div id="sqlTask"></div><div class="actions"><button id="sqlHint" class="ghost">ヒント</button><button id="sqlAnswer" class="ghost">解答を見る</button><button id="sqlNext" class="ghost">次の課題 ›</button><button id="sqlRandom" class="ghost">ランダム</button><button id="sqlWrong" class="ghost">間違い復習</button><small id="sqlReviewCount"></small></div><div id="sqlHelp" class="help" hidden></div></div><label for="sqlInput">SQL エディタ</label><textarea id="sqlInput" rows="5" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="SELECT * FROM users;"></textarea><div class="actions shortcuts" aria-label="SQL記号入力"><button type="button" class="ghost" data-sql-insert=";" aria-label="セミコロンを入力">;</button><button type="button" class="ghost" data-sql-insert="\" aria-label="バックスラッシュを入力">\</button><button type="button" class="ghost" data-sql-insert="*" aria-label="アスタリスクを入力">*</button><button type="button" class="ghost" data-sql-insert="'" aria-label="シングルクォートを入力">'</button><button type="button" class="ghost" data-sql-insert="(" aria-label="左括弧を入力">(</button><button type="button" class="ghost" data-sql-insert=")" aria-label="右括弧を入力">)</button></div><div class="actions"><button id="runSQL" class="primary">▶ 実行・採点</button><button id="resetSQL" class="ghost" disabled>DB初期化</button><button id="clearSQL" class="ghost">クリア</button></div><div id="sqlFeedback" class="feedback" aria-live="polite"></div><div id="sqlOutput" class="output" aria-live="polite"></div></section>
+<section id="admin" class="panel"><div class="sectionHead"><div><div class="eyebrow">01 / ADMIN LAB</div><h2>運用管理ターミナル</h2></div><span class="tag">模擬環境</span></div><p>Linux・psqlの操作を安全に練習。実際のサーバーやファイルは変更しません。Linuxコマンドとオプション、psqlメタコマンドは大文字・小文字を区別します。</p><p>「試験範囲外・実務向け」はOS固有の操作です。「関連知識」は試験用語に関連する補足です。すべて練習・進捗記録できます。</p><p>上から順に学習すると、環境確認→起動→接続→確認→運用→バックアップ→停止の流れを練習できます。lab DBは準備済みで、課題ごとに環境が初期化されます。systemctlはpg_ctlとは別のOSサービス管理方法です。</p><div class="controls"><label for="adminSelect">練習する課題</label><select id="adminSelect"></select></div><div class="task"><div id="adminTask"></div><div class="actions"><button id="adminHint" class="ghost">ヒント</button><button id="adminAnswer" class="ghost">解答を見る</button><button id="adminNext" class="ghost">次の課題 ›</button><button id="adminRandom" class="ghost">ランダム</button><button id="adminWrong" class="ghost">間違い復習</button><small id="adminReviewCount"></small></div><div id="adminHelp" class="help" hidden></div></div><div class="terminal"><div class="termhead"><span>● ● ●</span><span>postgres@lab</span><button id="clearTerm">表示クリア</button></div><pre id="terminalLog" aria-live="polite"></pre><form id="commandForm"><label id="prompt" for="command">$</label><input id="command" placeholder="コマンドを入力" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go"><button type="submit">実行</button></form></div><div id="adminBlocks" class="block-tool"><div class="block-mode" role="group" aria-label="入力ブロックの表示"><button type="button" data-hide aria-pressed="true">手入力のみ</button><button type="button" data-show aria-pressed="false">ブロック表示</button></div><div data-panel hidden><p>順番を考えてタップ。入力欄はいつでも直接編集できます。</p><div class="block-caption">選んだ順番（タップで取り消し）</div><div data-selected class="block-selected"></div><div class="block-caption">選択できるブロック</div><div data-bank class="block-bank"></div><div class="actions"><button type="button" data-undo class="ghost">1つ戻す</button><button type="button" data-clear class="ghost">入力をクリア</button></div></div></div><div class="actions shortcuts"><button data-insert="\\">\</button><button data-insert=";">;</button><button data-insert="-">-</button><button data-insert="/">/</button><button id="lastCommand">履歴 ↑</button><button id="resetLab" class="ghost">環境リセット</button></div><div id="adminFeedback" class="feedback" aria-live="polite"></div><div id="adminExplanation" class="explanation" aria-live="polite" hidden></div></section>
+<section id="sql" class="panel" hidden><div class="sectionHead"><div><div class="eyebrow">02 / SQL LAB</div><h2>PostgreSQL 実践</h2></div><span class="tag" id="sqlStatus">実行で起動</span></div><p>SQLを入力して実行すると自動起動します。PostgreSQL優先、起動失敗時はSQLite（文法に一部違いあり）。初回は通信が必要です。既存の練習用テーブルで検索を覚えた後、DDL・データ更新・トランザクションへ進みます。課題ごとにデータは初期化されます。全角・半角、SQLキーワードの大小文字は同じ扱いです。コロン「:」はセミコロン「;」の代用にはなりません。文字列の大小文字は区別します。</p><div class="actions"><button id="connect" class="primary">PostgreSQLを起動</button><button id="sqliteConnect" class="ghost">SQLiteで起動</button><button id="practiceSQL" class="ghost">解答チェック（通信不要）</button></div><div id="sqlError" class="feedback" aria-live="polite"></div><details><summary>練習用テーブル・初期データ</summary><div id="schema"></div></details><label for="sqlSelect">練習する課題</label><select id="sqlSelect"></select><div class="task"><div id="sqlTask"></div><div class="actions"><button id="sqlHint" class="ghost">ヒント</button><button id="sqlAnswer" class="ghost">解答を見る</button><button id="sqlNext" class="ghost">次の課題 ›</button><button id="sqlRandom" class="ghost">ランダム</button><button id="sqlWrong" class="ghost">間違い復習</button><small id="sqlReviewCount"></small></div><div id="sqlHelp" class="help" hidden></div></div><label for="sqlInput">SQL エディタ</label><textarea id="sqlInput" rows="5" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="SELECT * FROM users;"></textarea><div id="sqlBlocks" class="block-tool"><div class="block-mode" role="group" aria-label="入力ブロックの表示"><button type="button" data-hide aria-pressed="true">手入力のみ</button><button type="button" data-show aria-pressed="false">ブロック表示</button></div><div data-panel hidden><p>順番を考えてタップ。入力欄はいつでも直接編集できます。</p><div class="block-caption">選んだ順番（タップで取り消し）</div><div data-selected class="block-selected"></div><div class="block-caption">選択できるブロック</div><div data-bank class="block-bank"></div><div class="actions"><button type="button" data-undo class="ghost">1つ戻す</button><button type="button" data-clear class="ghost">入力をクリア</button></div></div></div><div class="actions shortcuts" aria-label="SQL記号入力"><button type="button" class="ghost" data-sql-insert=";" aria-label="セミコロンを入力">;</button><button type="button" class="ghost" data-sql-insert="\" aria-label="バックスラッシュを入力">\</button><button type="button" class="ghost" data-sql-insert="*" aria-label="アスタリスクを入力">*</button><button type="button" class="ghost" data-sql-insert="'" aria-label="シングルクォートを入力">'</button><button type="button" class="ghost" data-sql-insert="(" aria-label="左括弧を入力">(</button><button type="button" class="ghost" data-sql-insert=")" aria-label="右括弧を入力">)</button></div><div class="actions"><button id="runSQL" class="primary">▶ 実行・採点</button><button id="resetSQL" class="ghost" disabled>DB初期化</button><button id="clearSQL" class="ghost">クリア</button></div><div id="sqlFeedback" class="feedback" aria-live="polite"></div><div id="sqlOutput" class="output" aria-live="polite"></div><div id="sqlExplanation" class="explanation" aria-live="polite" hidden></div></section>
 <section id="quiz" class="panel" hidden><div class="eyebrow">03 / KNOWLEDGE CHECK</div><h2>確認問題</h2><p>一般知識→運用管理→SQLの試験分野順に復習。分野別正答率は確認問題と模試の回答履歴から計算します。</p><div class="task"><small id="accuracy"></small><small id="quizReviewCount"></small><details><summary>公式10分野の習熟状況</summary><p>確認問題・模試の回答済数と直近正解数（各問題の最後の回答が正解だった数）です。</p><div id="topicStats"></div></details></div><label for="quizFilter">ランダム・復習の分野</label><select id="quizFilter"><option value="all">全分野</option><option value="S1">一般知識</option><option value="S2">運用管理</option><option value="S3">開発・SQL</option><optgroup label="公式10分野"><option value="S1.1">S1.1 OSSとPostgreSQLの一般知識</option><option value="S1.2">S1.2 リレーショナルDBとSQL基礎</option><option value="S2.1">S2.1 クラスタ・データ保存</option><option value="S2.2">S2.2 起動・停止・標準ツール・psql</option><option value="S2.3">S2.3 接続・認証・設定・ログ</option><option value="S2.4">S2.4 バックアップ・リストア・WAL</option><option value="S2.5">S2.5 ロールと日常保守</option><option value="S3.1">S3.1 SQLとDBオブジェクト</option><option value="S3.2">S3.2 関数</option><option value="S3.3">S3.3 トランザクションとMVCC</option></optgroup></select><div class="actions"><button id="quizRandom" class="primary">ランダム出題</button><button id="quizWrong" class="ghost">間違い復習</button></div><label for="quizSelect">問題を選ぶ</label><select id="quizSelect"></select><div class="task" id="quizTask"></div><div id="quizOptions" class="options"></div><div id="quizFeedback" class="feedback" aria-live="polite"></div><div class="actions"><button id="quizSubmit" class="primary" hidden>選択を採点</button><button id="quizNext" class="primary">次の問題 ›</button></div></section>
 <section id="mock" class="panel" hidden><div class="eyebrow">04 / MOCK EXAM</div><h2>50問模擬試験</h2><div id="mockIntro"><p>一般8問・運用26問・SQL16問を公式10分野の重要度に合わせてランダム出題。解説と採点は終了後に表示。制限時間なし。ページを再読み込みすると受験中の回答は消えます。</p><button id="mockStart" class="primary">模試を開始</button></div><div id="mockBody" hidden><p id="mockCounter"></p><div id="mockQuestion" class="task"></div><div id="mockOptions" class="options"></div><div class="actions"><button id="mockPrev" class="ghost">前へ</button><button id="mockNext" class="primary">次へ</button><button id="mockFinish" class="ghost">終了・採点</button></div></div><div id="mockResult" hidden><h2 id="mockScore"></h2><p id="mockBreakdown"></p><button id="mockRestart" class="primary">別の模試を開始</button><div id="mockReview"></div></div></section><section id="ref" class="panel" hidden><div class="eyebrow">04 / REFERENCE</div><h2>コマンド早見表</h2><p>入力する場所にも注意。ターミナルとpsqlは別の環境です。</p><input id="searchRef" type="search" placeholder="pg_dump / シーケンス など" aria-label="早見表を検索"><div id="refList"></div></section>
-<footer>非公式のOSS-DB Silver学習教材 · v2.3<br>進捗は端末のブラウザに保存。SQLデータ・模擬環境は再読込で初期化されます。<br><span id="offlineStatus">公開ページでオフライン保存に対応します。</span></footer></main><script>
+<footer>非公式のOSS-DB Silver学習教材 · v2.4<br>進捗は端末のブラウザに保存。SQLデータ・模擬環境は再読込で初期化されます。<br><span id="offlineStatus">公開ページでオフライン保存に対応します。</span></footer></main><script>
 /* 問題データ。idは進捗保存に使うので、既存のidは変更しないこと。 */
 window.LESSONS = {
 admin: [
@@ -767,6 +770,197 @@ window.LESSONS.usage = {
   "q150": "同時更新を含む業務処理で一貫性を保ち、トランザクションの失敗に対処する。"
 };
 
+/* v2.4: beginner explanations, examples and glossary */
+window.LESSONS.beginner = {
+  "a01": "psqlは、PostgreSQLに話しかけるためのアプリです。-Uの後ろにユーザー名、-dの後ろに接続したいデータベース名を書きます。Linuxのターミナルで実行すると、SQLを入力できる画面に入ります。",
+  "a02": "テーブルとは、Excelの表のようにデータを行と列で保存するものです。\\dtを入力すると、今のDBで見えるテーブル名が一覧になります。",
+  "a03": "\\d usersはusersという表の設計図を見る操作です。列名、データ型、必須項目、インデックスなどを確認できます。",
+  "a04": "1つのPostgreSQLサーバーには複数のデータベースを作れます。\\lはその名前の一覧を表示します。",
+  "a05": "ロールとは、DBのユーザーや権限をまとめるための仕組みです。\\duで名前と属性を一覧表示します。",
+  "a06": "シーケンスは、IDなどに使う連番を作る仕組みです。\\dsでその一覧を表示します。",
+  "a07": "\\cはconnectの略です。psqlを閉じず、別のDBに接続し直せます。今のDBから移動するイメージです。",
+  "a08": "\\qはquitの略です。psqlだけを終了し、Linuxのターミナルに戻ります。DBサーバー自体は止まりません。",
+  "a09": "initdbはDBクラスタ（複数のDBをまとめて管理する保存場所）を新しく用意します。-Dで保存場所を指定します。作っただけでは起動しません。",
+  "a10": "pg_ctlはPostgreSQLサーバーの起動・停止などを管理するコマンドです。statusは、指定したクラスタが動いているかを調べます。",
+  "a11": "startはPostgreSQLを起動します。-Dで対象クラスタを指定します。起動すると、そのクラスタにあるDBへ接続できるようになります。",
+  "a12": "reloadは設定ファイルを読み直す操作です。サーバーを止めずに反映できる設定だけが変わります。ポート変更などは再起動が必要です。",
+  "a13": "fast停止は新しい接続を受け付けず、既存の接続も切り、まだ確定していない変更を取り消してから安全に停止します。",
+  "a14": "createdbは、稼働中のPostgreSQLに新しいDBを作るLinuxコマンドです。SQLのCREATE DATABASEと同じ目的です。",
+  "a15": "dropdbはDBを丸ごと削除します。表とデータも消えるため、本番では実行先を慎重に確認します。",
+  "a16": "pg_dumpは1つのDBの内容を復元できる形で書き出します。-dはDB名、-fは出力ファイル名です。DBを止めずに取得できます。",
+  "a17": "-Fcはカスタム形式というPostgreSQL専用のバックアップ形式です。後から一部だけ選んで復元することができます。",
+  "a18": "SQL形式のバックアップはCREATEやINSERTなどのSQLが入ったファイルです。psql -fで読み込むと、指定DBでそのSQLが実行されます。",
+  "a19": "pg_restoreはカスタム形式などのバックアップを読み込むコマンドです。-dで戻す先のDBを指定します。",
+  "a20": "pg_dumpallはサーバー内の全DBとロールなどをSQLに書き出します。pg_dumpは基本的に1つのDBだけです。",
+  "a21": "pg_basebackupは、DBクラスタのファイルを復旧に使える状態でコピーするコマンドです。pg_dumpのようにSQLに変換するわけではありません。",
+  "a22": "UPDATEやDELETEで不要になった古い行は、すぐにはファイルから消えません。VACUUMは、その領域を後から再利用できるようにします。",
+  "a23": "ANALYZEは、表に何件あるか、どの値が多いかなどの情報を集めます。PostgreSQLはそれを参考に速い検索方法を選びます。",
+  "a24": "SHOW portは、PostgreSQLが接続を受け付ける番号を表示します。通常は5432ですが、別の番号を設定できます。",
+  "a25": "SHOW config_fileは、サーバー設定（postgresql.conf）が置かれている実際の場所を表示します。",
+  "a26": "SHOW hba_fileは、誰がどこからどのDBへ接続できるかを決めるpg_hba.confの場所を表示します。",
+  "a27": "enableは、次にLinuxが起動したときにPostgreSQLサービスも自動で起動するようにする設定です。今すぐ起動するstartとは別です。",
+  "a28": "disableは自動起動の設定を解除します。今動いているPostgreSQLを停止する操作ではありません。",
+  "a29": "is-enabledは自動起動の設定を確認します。今動いているかどうかはstatusなどで確認します。",
+  "a30": "systemctl startはLinuxのサービス管理機能を使って今すぐPostgreSQLを起動します。自動起動設定は変わりません。",
+  "a31": "systemctl stopはLinuxのサービス管理機能で今すぐPostgreSQLを止めます。次回の自動起動設定はそのままです。",
+  "a32": "systemctl statusはサービスが動いているかや、直近のログなどを表示します。",
+  "a33": "restartは停止してから起動します。利用中のアプリの接続は切れます。",
+  "a34": "systemctl reloadは、サービスに設定の読み直しを指示します。再起動が必要な設定は反映できません。",
+  "a35": "smart停止は、今つながっている利用者が全員接続を終えるまで待ちます。接続しっぱなしのアプリがあると停止も待ち続けます。",
+  "a36": "immediate停止は正常終了の処理を省いて強制的に止めます。次回起動時にログを使って整合性を回復する処理が必要です。",
+  "a37": "pg_ctl restartは指定クラスタを停止して再び起動します。クラスタ内の全DBに影響します。",
+  "a38": "PGDATAはDBクラスタの場所を記憶しておく環境変数です。exportで設定すると、そのシェルから起動するコマンドにも渡されます。",
+  "a39": "echoは文字を表示するコマンドです。$PGDATAと書くと、変数PGDATAに入っている保存先が表示されます。",
+  "a40": "PGDATAにクラスタの場所が設定されていれば、pg_ctlの-Dを省略できます。-Dを明示するとそちらが優先です。",
+  "a41": "createuserはPostgreSQLにログインできるロールを作るLinuxコマンドです。OSのユーザーを作る操作ではありません。",
+  "a42": "dropuserはDBのロールを削除します。そのロールが表などを所有している場合は、先に所有権などを整理します。",
+  "a43": "pg_config --versionはインストールされたPostgreSQLの開発用情報からバージョンを表示します。接続先のサーバー版とは限りません。",
+  "a44": "pg_controldataはクラスタの管理情報をファイルから読みます。起動しているかだけでなく、チェックポイントなどの内部情報を調べられます。",
+  "a45": "pg_isreadyはDBサーバーが接続を受け付けているか調べます。-pはポート番号です。実際にSQLが成功するかまでは調べません。",
+  "a46": "pg_resetwalは重大な障害時に使う危険な復旧ツールです。-nは実際には変更せず、何をするかを確認するだけです。",
+  "a47": "vacuumdbはLinuxからVACUUMを実行するためのコマンドです。-dはDB、-tは対象の表を指定します。",
+  "a48": "-zを付けたvacuumdbはVACUUMとANALYZEを両方行います。不要領域の再利用と検索用統計の更新をまとめて行います。",
+  "a49": "-lは起動時の出力をファイルに追記する指定です。server.logにメッセージが残るので、起動に失敗したときも原因を確認できます。",
+  "a50": "-wのwはwait（待つ）です。起動を指示した後、接続を受け付けられる状態になるまでコマンドが待ちます。現在は-wが標準なので省略できます。逆に-Wは待ちません。",
+  "a51": "-t 30は完了を待つ時間を30秒に設定します。時間内に完了しないとpg_ctlは失敗を返しますが、サーバーの処理が続く場合があります。",
+  "a52": "-hは接続先のホスト、-pはポート、-Uはユーザー、-dはDB名です。別のサーバーにあるDBにも接続できます。",
+  "a53": "-cの後ろにSQLを書くと、psqlを対話画面として開いたままにせず、そのSQLを実行して終了します。",
+  "a54": "psql --versionは手元のpsqlアプリのバージョンを表示します。DBサーバーのバージョンはSELECT version()で調べます。",
+  "a55": "\\conninfoは今つながっているDB名、ユーザー、接続先などを表示します。本番とテストを間違えていないか確認できます。",
+  "a56": "スキーマとは、1つのDB内で表などをグループ分けする名前空間です。\\dnで一覧を見ます。",
+  "a57": "ビューは保存したSELECT文を表のように扱う仕組みです。\\dvでビュー一覧を見ます。",
+  "a58": "インデックスは本の索引のように検索を速くする仕組みです。\\diで一覧を見ます。",
+  "a59": "関数はDBの中で呼び出せる処理です。\\dfで関数一覧を見ます。",
+  "a60": "\\dpはテーブルなどに対して、誰がSELECTやUPDATEなどを許可されているか表示します。",
+  "a61": "\\hの後にSQLの名前を書くと、そのSQLの書き方を確認できます。",
+  "a62": "\\?はpsql専用コマンドのヘルプです。SQL自体の文法は\\hで確認します。",
+  "a63": "\\timing onにすると、SQLを実行するたびにかかった時間が表示されます。",
+  "a64": "SHOW data_directoryはDBクラスタのデータファイルが保存されるディレクトリを表示します。",
+  "a65": "SHOW ALLは、接続中のサーバーの設定値をまとめて表示します。",
+  "a66": "max_connectionsは同時に接続できる数の上限です。接続が多すぎてエラーになる場合の確認に使います。",
+  "a67": "listen_addressesはPostgreSQLがどのネットワークアドレスで接続を待ち受けるかを決めます。",
+  "a68": "timezoneは日時を扱うときのタイムゾーン設定です。日本時間とUTCのずれなどを調べられます。",
+  "a69": "search_pathは、スキーマ名を省略した表名をどの順番で探すかを決めます。",
+  "a70": "SETは現在の接続の設定を変えます。statement_timeoutを5秒にすると、長すぎるSQLが取り消されます。",
+  "a71": "RESETはSETで変更した設定を、その設定の既定値に戻します。",
+  "a72": "pg_settingsは設定の値や変更方法をSQLで調べられる一覧です。WHEREで必要な設定に絞れます。",
+  "a73": "pg_reload_conf()は、SQLから設定の読み直しを指示する関数です。再起動が必要な項目は別途対応します。",
+  "a74": "pg_hba_file_rulesは、認証設定の各行とエラーなどをSQLで確認できるビューです。",
+  "a75": "pg_restore -lはバックアップの中身を一覧表示します。実際の復元はまだ行いません。",
+  "a76": "-gはロールやテーブルスペースなど、クラスタ全体で共有する設定だけを書き出します。",
+  "a77": "-sは表の作り方や制約などの定義だけを保存します。表に入っているデータは保存しません。",
+  "a78": "-aは表の中身などのデータだけを保存します。復元先には対応する表の定義が必要です。",
+  "a79": "-t usersを指定すると、users表を対象にバックアップします。関連する別表などがすべて自動で含まれるとは限りません。",
+  "a80": "-Fdはバックアップを1つのディレクトリに複数のファイルで保存します。複数の作業を並行してバックアップする方法にも対応します。",
+  "a81": "-Ftはtarアーカイブ形式を指定します。複数の内容を1つのファイルにまとめる形式です。",
+  "a82": "-X streamはクラスタのコピー中に必要なWAL（変更記録）も別の接続で受け取ります。",
+  "a83": "COPY TOは表のデータをCSVなどに書き出します。ファイルはDBサーバー側に保存されます。",
+  "a84": "\\copyはpsqlを動かしているPC側にファイルを書き出します。サーバーのファイルに直接アクセスするCOPYとは場所が違います。",
+  "a85": "COPY FROMはサーバー側に置いたファイルのデータを表へ取り込みます。",
+  "a86": "archive_modeはWAL（DBの変更記録）を別の場所へ保管する仕組みを有効にする設定です。",
+  "a87": "archive_commandはWALを別の保管先へ送るためのコマンド設定です。SHOWは内容を表示するだけです。",
+  "a88": "CREATE ROLE ... LOGINはDBへログイン可能なアカウントをSQLで作ります。",
+  "a89": "ALTER ROLEは既存ロールの属性を変更します。CREATEDBを付けるとDBを作る権限を与えます。",
+  "a90": "DROP ROLEは既存のロールを削除するSQLです。表などの所有者になっている場合は先に整理が必要です。",
+  "a91": "GRANTは操作を許可するSQLです。SELECTを与えると、指定したロールが表を読み取れるようになります。",
+  "a92": "REVOKEは付与した権限を取り消します。他のロールを通じて同じ権限を持つ場合は別途確認が必要です。",
+  "a93": "current_userは現在SQLを実行する際の有効なロール名を返します。",
+  "a94": "version()は接続しているPostgreSQLサーバーのバージョンなどを表示します。",
+  "a95": "information_schemaは、表や列などの情報を標準的なSQLで調べるためのビューの集まりです。",
+  "a96": "pg_catalogはPostgreSQLの管理情報を持つスキーマです。pg_databaseにはDBの情報があります。",
+  "a97": "VACUUM ANALYZEは不要な行の領域を再利用できるようにし、検索方法を選ぶための統計情報も更新します。",
+  "a98": "VACUUM FULLは表を新しく書き直して、不要な領域をOSに返します。処理中は他の操作を強く制限するので通常は避けます。",
+  "a99": "autovacuumは不要な行の領域を再利用したり統計を更新したりする自動保守の仕組みです。",
+  "a100": "vacuumdb -ZはANALYZEだけを実行します。不要領域を再利用するVACUUMは行いません。",
+  "a101": "サーバーが止まっているとpg_isreadyは接続できないことを示します。終了コードも確認できます。",
+  "a102": "psql -fはファイルに書いてあるSQLを順番に実行します。何度も同じSQLを打たなくて済みます。",
+  "a103": "\\oはpsqlの問い合わせ結果の出力先をファイルなどへ変更します。引数なしの\\oで通常表示に戻せます。",
+  "a104": "\\l+はDB一覧にサイズなどの詳細も追加して表示します。",
+  "a105": "log_directoryはログファイルの保存先の設定です。相対パスの場合はデータディレクトリを基準にします。",
+  "a106": "logging_collectorはサーバーの標準エラー出力などを集めてログファイルに書く仕組みです。",
+  "a107": "pg_settingsのcontextは設定を変更するために何が必要かを示します。例えばpostmasterなら再起動が必要です。",
+  "a108": "\\copy FROMはpsqlを動かしているPC側のファイルを読み取って、DBへデータを登録します。",
+  "a109": "ON_ERROR_STOP=1を設定すると、SQLファイルの途中でエラーが起きた時点でpsqlが処理を止めます。すでに確定した変更まで自動で戻す指定ではありません。",
+  "a110": "pg_restore -t usersはアーカイブからusersという表を選んで復元します。必要な依存オブジェクトを別途確認します。",
+  "s01": "SELECTはデータを取得するSQLです。*は全列、FROMはどの表から取るかを指定します。",
+  "s02": "WHEREは行を選ぶ条件です。age >= 30なら30歳以上の行だけが残ります。",
+  "s03": "ORDER BYは並べ替えです。DESCは大きい順、ASCは小さい順です。",
+  "s04": "LIKEは文字のパターンに合うか調べます。%は0文字以上の任意の文字に対応します。",
+  "s05": "NULLは値がない状態です。=ではなくIS NULLで調べます。",
+  "s06": "COUNT(*)は条件に合う行の数を数えます。",
+  "s07": "GROUP BYは同じ値を持つ行をグループにまとめ、グループごとに集計できます。",
+  "s08": "HAVINGはGROUP BYでまとめた結果に条件を付けます。WHEREは集計前の行に条件を付けます。",
+  "s09": "INNER JOINは両方の表に対応する行がある場合だけ結果に含めます。ONは結合条件です。",
+  "s10": "LEFT JOINは左側の表の行を残します。右側に対応する行がなければ、その列はNULLになります。",
+  "s11": "COALESCEは左から順に見て最初のNULLではない値を返します。",
+  "s12": "副問い合わせはSQLの中に別のSELECTを書く方法です。内側の結果を外側の条件などに利用します。",
+  "s13": "DISTINCTは取得結果の重複を除きます。",
+  "s14": "SUMは数値の合計を返します。",
+  "s15": "INSERT INTOは表に新しい行を追加します。VALUESに登録する値を書きます。",
+  "s16": "UPDATEは既存の行を変更します。SETに変更内容、WHEREに対象を指定します。",
+  "s17": "DELETEは表から行を削除します。WHEREを忘れると全行が対象です。",
+  "s18": "BEGINで一連の処理を開始し、ROLLBACKでその間の変更を取り消します。",
+  "s19": "CREATE TABLEは新しい表を作ります。列名、型、制約などを指定します。",
+  "s20": "CREATE INDEXは検索のための索引を作ります。データ更新の負荷も増えることがあります。",
+  "s21": "BETWEENは指定した範囲に入るかを調べます。両端も含みます。",
+  "s22": "INは候補のどれかと一致するかを調べます。",
+  "s23": "NOT INは候補のどれにも一致しないかを調べます。候補にNULLがあると結果に注意が必要です。",
+  "s24": "IS NOT NULLは値が入っている行を選びます。",
+  "s25": "ANDは両方の条件を満たす必要があります。",
+  "s26": "ORは少なくとも一方の条件を満たせばよいです。",
+  "s27": "LIMITは取得する最大件数を指定します。ORDER BYで順番を決めて使うと確実です。",
+  "s28": "OFFSETは最初の何件を飛ばすかを指定します。",
+  "s29": "AVGは平均値を求めます。NULLは平均の計算から除外されます。",
+  "s30": "MINは最小値、MAXは最大値を返します。",
+  "s31": "COUNT(列名)はNULLではない値を持つ行の数を返します。",
+  "s32": "EXISTSは内側のSELECTで1行でも見つかると真になります。",
+  "s33": "NOT EXISTSは内側のSELECTで1行も見つからない場合に真になります。",
+  "s34": "CASE WHENは条件によって返す値を切り替えます。Pythonのifに近い考え方です。",
+  "s35": "UNIONは複数のSELECT結果を縦につなぎ、重複する行を除きます。",
+  "s36": "LOWERは文字列を小文字に変換します。",
+  "s37": "UPPERは文字列を大文字に変換します。",
+  "s38": "CHAR_LENGTHは文字数を返します。バイト数とは異なります。",
+  "s39": "SUBSTRINGは文字列の指定位置から一部を取り出します。",
+  "s40": "REPLACEは文字列の中にある指定文字列を別の文字列に置き換えます。",
+  "s41": "TRIMは通常、文字列の前後の空白を除きます。",
+  "s42": "CONCATは複数の値を文字列としてつなぎます。",
+  "s43": "SQLでも*や+などを使って数値の計算ができます。",
+  "s44": "EXTRACTは日時から年や月などの一部分を取り出します。",
+  "s45": "TO_CHARは日時などを指定した書式の文字列に変換します。",
+  "s46": "INTERVALは1日や1か月などの時間の長さを表します。",
+  "s47": "JSONBはキーと値の組を保存できます。->>は指定キーの値を文字列として取り出します。",
+  "s48": "@>は左側のJSONBが右側の内容を含むかを調べます。",
+  "s49": "ビューはSELECT文に名前を付けて表のように使う仕組みです。",
+  "s50": "シーケンスは連番を生成します。nextvalで次の番号を取得します。",
+  "s51": "~は正規表現に一致するかを調べます。^は文字列の先頭を表します。",
+  "s52": "SIMILAR TOはSQLのパターン構文で一致する文字列を調べます。",
+  "s53": "COUNT(DISTINCT 列)は重複とNULLを除いた値の種類数を数えます。",
+  "s54": "CROSS JOINは左と右の表の全組合せを作ります。",
+  "s55": "UNION ALLは複数のSELECT結果を縦につなぎ、重複も残します。",
+  "s56": "整数同士の割り算は小数部分を切り捨てます。numericに変換すると小数も扱えます。",
+  "s57": "AGEは2つの日時の差を年・月・日などで返します。",
+  "s58": "||は文字列を連結する演算子です。",
+  "s59": "@@はJSONBに対しJSONパスの条件を評価します。",
+  "s60": "SQLの真偽値にはTRUE、FALSE、値不明を示すNULLがあります。",
+  "s61": "ALTER TABLE ... ADD COLUMNは既存の表に列を追加します。",
+  "s62": "RENAME COLUMNは既存の列名を変更します。",
+  "s63": "DROP TABLEは表そのものと中のデータを削除します。",
+  "s64": "UNIQUEは同じ値の重複登録を防ぎます。通常、NULLの扱いは別です。",
+  "s65": "CHECKは登録や更新する値が条件を満たすかチェックします。",
+  "s66": "DEFAULTは列の値を省略したときに入れる初期値です。",
+  "s67": "NOT NULLは値がない状態での登録を禁止します。",
+  "s68": "REFERENCESは別の表のキーを参照する外部キー制約です。",
+  "s69": "IDENTITYはIDなどの値を自動で生成する列です。",
+  "s70": "マテリアライズドビューはSELECT結果を実際に保存します。内容を最新にするには更新が必要です。",
+  "s71": "パーティションは大きな表を範囲などに分けて管理する仕組みです。",
+  "s72": "CREATE FUNCTIONは繰り返し呼び出せる関数をDBの中に作ります。",
+  "s73": "INSERT ... SELECTは別の検索結果をそのまま表に登録するSQLです。",
+  "s74": "RETURNINGは更新した行などの値をその場で返します。",
+  "s75": "COMMITはBEGINからの変更を確定します。確定した変更は通常ROLLBACKでは戻せません。"
+};
+window.LESSONS.glossary = [["クラスタ","複数のDBをまとめて管理するPostgreSQLの単位"],["ロール","DBユーザーや権限をまとめる仕組み"],["WAL","DBの変更内容を記録し、障害からの復旧に使うログ"],["PITR","バックアップと変更ログから指定時刻の状態へ戻す方法"],["MVCC","複数の利用者が同時に操作できるよう行のバージョンを管理する仕組み"],["トランザクション","複数のDB操作をまとめ、全部成功か取り消しかを扱う単位"],["スキーマ","DB内で表などをグループ分けする名前空間"],["インデックス","本の索引のように検索を速くする仕組み"],["シーケンス","IDなどに使う連番を作る仕組み"],["外部キー","他の表に対応する行があることを保証する制約"],["主キー","表の1行を一意に見分けるキー"],["autovacuum","不要領域の再利用や統計更新などを自動で行う仕組み"],["VACUUM","不要な行の領域を再利用できるようにする処理"],["ANALYZE","検索方法を選ぶためにデータの統計を集める処理"],["レプリケーション","別のサーバーなどにデータの変更を反映する仕組み"],["マテリアライズドビュー","SELECTの結果を保存して再利用する仕組み"],["ビュー","保存したSELECT文を表のように扱う仕組み"],["正規化","重複や更新漏れを減らすため表の構造を整理すること"],["NULL","値がない・不明であることを示す特別な値"],["排他ロック","他の処理が対象を同時に変更することなどを防ぐ制御"],["メタデータ","表名や列名など、データの構造を説明する情報"],["実行計画","DBがSQLを実行するために選ぶ検索・結合などの手順"],["認証","接続する人が本人か確認すること"],["ライセンス","ソフトウェアの利用・配布などの条件"],["JSONB","JSONデータを検索などに適した形式で保存する型"],["コミット","トランザクションの変更を確定する操作"],["ロールバック","まだ確定していない変更を取り消す操作"],["分離レベル","同時実行中の別処理の変更がどこまで見えるかを決める設定"],["バックアップ","障害や誤操作に備えてデータのコピーを保存すること"],["カスタム形式","pg_restoreで選択復元できるPostgreSQL専用のバックアップ形式"],["環境変数","OSのシェルなどがコマンドへ渡す設定値"],["接続プール","DB接続を何度も作らず再利用する仕組み"],["マイグレーション","アプリの変更に合わせてDBの定義を変更する作業"],["パーティション","1つの大きな表を複数の部分に分けて管理する仕組み"],["ダーティリード","別の処理がまだ確定していない変更を読み取ること"],["チェックポイント","変更済みデータをディスクへ書き出す区切り"],["表領域","DBのデータファイルの保存場所を指定する仕組み"],["トリガー","登録や更新などをきっかけにDBで自動実行する処理"],["DDL","表などの構造を作成・変更・削除するSQL"],["DML","表のデータを操作するSQL"],["OSS","ソースコードが公開され、ライセンス条件に従って利用・改変などができるソフトウェア"]];
+Object.assign(window.LESSONS.usage,{"a01":"A5:SQLなどのGUIを使わず、LinuxからDBに接続してSQLを実行したいときに使います。","a11":"検証用DBを手動で起動したいときや、保守作業で止めたDBを起動するときに使います。Linuxサービスとして管理している場合は、そのサービス管理方法を使うのが一般的です。","a49":"DBが起動しない場合に使います。例えばポート番号が他のクラスタと重複していたら、その原因をログファイルから探せます。","a50":"手動ではpg_ctl startで十分です。例えば毎朝の集計バッチで「DBを起動→SQLを実行」と続けたい場合、起動成功を確認してから次へ進めます。例：PGDATA設定済みなら pg_ctl -w start && psql -d lab -f setup.sql。-wは現在の標準動作なのでバッチでも省略できます。","a51":"大量のデータを復旧するなど、起動に時間がかかる環境で待ち時間を調整するときに使います。","a53":"毎日決まった時刻に件数を確認するような自動処理で使います。例：psql -d lab -c 'SELECT COUNT(*) FROM users;'","a45":"アプリを起動する前にDBが接続を受け付けているか確認したい場合や、監視で使います。","a22":"大量に予約データを削除した後、不要な領域を再利用させたいときに使います。普段はautovacuumが自動で実施するので手動で頻繁に実行する必要はありません。","a23":"大量のExcelデータを取り込んだ後などに使います。データの分布が大きく変わると、検索の方法を選ぶための情報が古くなることがあるからです。","a98":"大量削除後、ディスクの空き容量を実際に増やす必要があるときに検討します。表を使えなくなる時間や追加のディスク容量が必要なので、通常のVACUUMとは使い分けます。","a12":"例えばpg_hba.confを変更した後、利用者の接続を切らずに認証設定を読み直したい場合に使います。","a35":"利用者が作業を終えてから止めたい保守で使います。誰かが接続したままだと止まらないので注意します。","a36":"普通の方法で止められない緊急時だけに検討します。普段の保守ではfastなどの正常停止を選びます。","a39":"別のクラスタを操作してしまわないように、作業前に保存場所を確認するときに使います。","a40":"同じクラスタを何度も操作する場合に-Dの入力を減らせます。複数クラスタがある場合は-Dを指定すると間違いにくくなります。","a16":"本番のデータをバックアップしたり、別の検証DBに復元したりするときに使います。","a46":"通常の運用では使いません。重大な破損で専門家が復旧方法を検討する際の確認用です。","q24":"DB起動後にSQLを実行するバッチなどで、起動を待つか、別に接続可能かを確認するかを考えるときに使います。","q166":"DBの起動を指示した直後にアプリを起動する場合、まだ接続できないことがあります。-wで待つか、pg_isreadyなどで別途確認します。"});
+
 </script><script>
 /* Stateful teaching simulator, NOT a real shell or PostgreSQL server. */
 window.AdminLab = class {
@@ -842,6 +1036,49 @@ window.SQLPractice={normalize,command,matches:(a,b)=>JSON.stringify(tokens(a))==
 })();
 
 </script><script>
+(function blocksModule(){
+'use strict';
+// Preserve quoted strings, dollar-quoted SQL bodies, paths and case-sensitive options.
+function parts(source){
+ const result=[];let buf='',i=0;const flush=()=>{if(buf){result.push(buf);buf=''}};
+ while(i<source.length){
+  const c=source[i];
+  if(/\s/.test(c)){flush();i++;continue}
+  if(c===';'){flush();result.push(c);i++;continue}
+  if(c==="'"||c==='"'){const quote=c;buf+=c;i++;while(i<source.length){const x=source[i++];buf+=x;if(x===quote){if(source[i]===quote){buf+=source[i++];continue}break}}continue}
+  if(c==='$'){const m=source.slice(i).match(/^\$(?:[A-Za-z_][A-Za-z_0-9]*)?\$/);if(m){const end=source.indexOf(m[0],i+m[0].length);if(end>=0){const next=end+m[0].length;buf+=source.slice(i,next);i=next;continue}}}
+  buf+=c;i++;
+ }flush();return result;
+}
+function join(tokens,base=''){let s=base;for(const t of tokens){s+=t===';'||!s||/\s$/.test(s)?t:' '+t}return s}
+function shuffled(tokens,random=Math.random){const a=tokens.map((value,id)=>({value,id}));for(let i=a.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}if(a.length>1&&a.every((x,i)=>x.value===tokens[i])){const j=a.findIndex(x=>x.value!==a[0].value);if(j>0)[a[0],a[j]]=[a[j],a[0]]}return a}
+function create(input,root,storage,key,doc=document,random=Math.random){
+ const bank=root.querySelector('[data-bank]'),selected=root.querySelector('[data-selected]'),panel=root.querySelector('[data-panel]'),show=root.querySelector('[data-show]'),hide=root.querySelector('[data-hide]'),undo=root.querySelector('[data-undo]'),clear=root.querySelector('[data-clear]');
+ let visible=false,tiles=[],chosen=[],base='',last='',source='';
+ try{visible=storage?.getItem(key)==='1'}catch{}
+ function toggle(on){visible=on;panel.hidden=!on;show.setAttribute('aria-pressed',String(on));hide.setAttribute('aria-pressed',String(!on));try{storage?.setItem(key,on?'1':'0')}catch{}}
+ function render(){
+  bank.replaceChildren();selected.replaceChildren();
+  if(!chosen.length){const p=doc.createElement('span');p.className='block-empty';p.textContent='選んだブロックがここに並びます';selected.append(p)}
+  for(const id of chosen){const t=tiles.find(x=>x.id===id);const b=doc.createElement('button');b.type='button';b.className='chosen-block';b.textContent=t.value+' ×';b.setAttribute('aria-label',t.value+' を取り消す');b.onclick=()=>remove(id);selected.append(b)}
+  for(const t of tiles){if(chosen.includes(t.id))continue;const b=doc.createElement('button');b.type='button';b.className='word-block';b.textContent=t.value;b.onclick=()=>add(t.id);bank.append(b)}
+  undo.disabled=chosen.length===0;
+ }
+ function sync(){if(input.value!==last){base=input.value;chosen=[];last=input.value}}
+ function write(){input.value=join(chosen.map(id=>tiles.find(t=>t.id===id).value),base);last=input.value;render()}
+ function add(id){sync();if(chosen.includes(id)||!tiles.some(t=>t.id===id))return;chosen.push(id);write()}
+ function remove(id){sync();chosen=chosen.filter(x=>x!==id);write()}
+ function reset(answer){source=answer;tiles=shuffled(parts(answer),random);chosen=[];base=input.value;last=input.value;render()}
+ input.addEventListener('input',()=>{sync();render()});
+ show.onclick=()=>{sync();render();toggle(true)};hide.onclick=()=>toggle(false);
+ undo.onclick=()=>{sync();chosen.pop();write()};
+ clear.onclick=()=>{input.value='';reset(source)};
+ toggle(visible);return{reset,sync:()=>{sync();render()},visible:()=>visible};
+}
+window.CommandBlocks={parts,join,shuffled,create};
+})();
+
+</script><script>
 /* UI / progress / real PostgreSQL adapter */
 (()=>{'use strict';const L=window.LESSONS,$=id=>document.getElementById(id);const KEY='ossdb-lab-progress-v1';let done=new Set();try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(x))done=new Set(x)}catch{};let admin,db,expected,locked=false,history='',sqlLoaded=false,practice=false,engine='';
 const scope=t=>L.adminScope?.[t[0]]||'';
@@ -855,7 +1092,12 @@ function renderStats(){const e=$('accuracy');if(!e)return;topicStats();const gro
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function correctSet(t){return Array.isArray(t[4])?t[4]:[t[4]]}
 function grade(t,chosen){const c=correctSet(t);return chosen.length===c.length&&c.every(i=>chosen.includes(i))}
-function usage(t){return L.usage?.[t[0]]?'\n\n【実務での使用用途】\n'+L.usage[t[0]]:'';}
+function glossary(t){const source=[t[1],t[2],typeof t[5]==='string'?t[5]:'',L.usage?.[t[0]]||''].join(' ');const items=(L.glossary||[]).filter(([word])=>source.toLowerCase().includes(word.toLowerCase())).filter(([word],i,all)=>!all.some(([other],j)=>i!==j&&other.includes(word))).slice(0,3);return items.length?'\n\n【用語の意味】\n'+items.map(([word,meaning])=>word+'：'+meaning).join('\n'):''}
+function usage(t){return L.usage?.[t[0]]?'\n\n【いつ使う？】\n'+L.usage[t[0]]+glossary(t):'';}
+const blockUI={admin:window.CommandBlocks.create($('command'),$('adminBlocks'),localStorage,KEY+'-admin-blocks'),sql:window.CommandBlocks.create($('sqlInput'),$('sqlBlocks'),localStorage,KEY+'-sql-blocks')};
+function explain(g,t){const e=$(g+'Explanation');e.hidden=false;e.textContent='【解答】\n'+t[4]+'\n\n【何をする？】\n'+(L.beginner?.[t[0]]||(g==='admin'?t[5]:t[1]))+usage(t)}
+function clearExplain(g){const e=$(g+'Explanation');e.hidden=true;e.textContent=''}
+
 function reason(t,i){return L.quizExplanations[t[0]]?.[i]||(correctSet(t).includes(i)?t[5]:'この問いの条件とは一致しません。'+t[5])}
 function chooseTask(g,filter){if(g==='sql'&&locked)return;const idx=L[g].map((t,i)=>({t,i})).filter(x=>filter(x.t));if(!idx.length){msg(g+'Feedback','該当する問題がありません。');return}const s=$(g+'Select'),pool=idx.filter(x=>x.i!==Number(s.value));s.value=String(shuffle(pool.length?pool:idx)[0].i);s.dispatchEvent(new Event('change'))}
 
@@ -866,15 +1108,15 @@ function current(g){return L[g][Number($(g+'Select').value)||0]}
 function setupSelect(g){const s=$(g+'Select');let chapter='',group=s;L[g].forEach((t,i)=>{const label=L.chapters?.[g]?.[t[0]]||'';if(label&&label!==chapter){group=document.createElement('optgroup');group.label=label;s.append(group);chapter=label}const o=document.createElement('option');o.value=i;o.textContent=t[1];group.append(o)});s.value=String(Math.max(0,L[g].findIndex(t=>!done.has(t[0]))))}
 function next(g){const s=$(g+'Select');s.value=(Number(s.value)+1)%L[g].length;s.dispatchEvent(new Event('change'))}
 function taskText(id,t,sub){const e=$(id);e.textContent=t[2];const g=id.replace(/Task$/,'');const chapter=L.chapters?.[g]?.[t[0]];if(chapter||sub){const x=document.createElement('small');x.textContent=[chapter,sub].filter(Boolean).join(' / ');e.append(x)}}
-function help(g,answer){const t=current(g),e=$(g+'Help');e.hidden=false;e.textContent=(answer?'解答：'+t[4]+(g==='admin'?'\n'+t[5]:'')+usage(t):'ヒント：'+t[3]);}
+function help(g,answer){const t=current(g),e=$(g+'Help');if(answer){e.hidden=true;e.textContent='';explain(g,t);$(g+'Explanation').scrollIntoView({block:'nearest',behavior:'smooth'});}else{e.hidden=false;e.textContent='ヒント：'+t[3];}}
 for(const g of ['admin','sql','quiz'])setupSelect(g);for(const g of ['admin','sql']){ $(g+'Hint').onclick=()=>help(g,false);$(g+'Answer').onclick=()=>help(g,true);$(g+'Next').onclick=()=>next(g)}
 for(const b of document.querySelectorAll('nav button'))b.onclick=()=>{for(const x of document.querySelectorAll('nav button')){x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',x===b?'true':'false');$(x.dataset.tab).hidden=x!==b}};
 $('resetProgress').onclick=()=>{if(confirm('すべての正解記録を消しますか？')){done.clear();try{localStorage.removeItem(KEY);localStorage.removeItem(STATS)}catch{}attempts={};renderStats();progress()}};
 function log(s){const e=$('terminalLog');e.textContent+=(e.textContent?'\n':'')+s;e.scrollTop=e.scrollHeight}
-function adminTask(){const t=current('admin');taskText('adminTask',t,(t[6]==='psql'?'入力場所：psql（lab）':'入力場所：Linuxシェル')+(scope(t)?' / '+scope(t):''));$('adminHelp').hidden=true;msg('adminFeedback');admin=new window.AdminLab(t);$('prompt').textContent=admin.prompt;$('terminalLog').textContent='OSS-DB Lab 模擬環境\n'+(admin.mode==='psql'?'psql (16, simulated) / lab':'postgres@lab:~$')+'\nhelp または \\? で対応コマンドを確認。';$('command').value='';history=''}
+function adminTask(){const t=current('admin');taskText('adminTask',t,(t[6]==='psql'?'入力場所：psql（lab）':'入力場所：Linuxシェル')+(scope(t)?' / '+scope(t):''));$('adminHelp').hidden=true;msg('adminFeedback');admin=new window.AdminLab(t);$('prompt').textContent=admin.prompt;$('terminalLog').textContent='OSS-DB Lab 模擬環境\n'+(admin.mode==='psql'?'psql (16, simulated) / lab':'postgres@lab:~$')+'\nhelp または \\? で対応コマンドを確認。';$('command').value='';history='';clearExplain('admin');blockUI.admin.reset(t[4])}
 $('adminSelect').onchange=adminTask;$('resetLab').onclick=adminTask;$('clearTerm').onclick=()=>{$('terminalLog').textContent=''};
-$('commandForm').onsubmit=e=>{e.preventDefault();const raw=$('command').value.trim();if(!raw)return;const input=window.SQLPractice.command(raw);history=raw;const prompt=admin.prompt,t=current('admin');const correctPlace=admin.mode===t[6];log(prompt+' '+raw);const canonical=correctPlace&&admin.matches(input,t)?t[4]:input;const r=admin.run(canonical);log(r.text);$('prompt').textContent=admin.prompt;$('command').value='';const passed=r.ok&&correctPlace&&admin.matches(input,t);record(t[0],passed);if(passed){mark(t[0]);msg('adminFeedback','正解！ '+t[5]+usage(t),true)}else if(!r.ok){msg('adminFeedback','実行できませんでした。上のメッセージを確認してください。',false)}else msg('adminFeedback','コマンドを実行しました。課題に合うコマンドを入力してください。')};
-for(const b of document.querySelectorAll('[data-insert]'))b.onclick=()=>{const e=$('command'),a=e.selectionStart??e.value.length,z=e.selectionEnd??a;const value=b.dataset.insert==='\\\\'?'\\':b.dataset.insert;e.setRangeText(value,a,z,'end');e.focus()};$('lastCommand').onclick=()=>{$('command').value=history;$('command').focus()};
+$('commandForm').onsubmit=e=>{e.preventDefault();const raw=$('command').value.trim();if(!raw)return;const input=window.SQLPractice.command(raw);history=raw;const prompt=admin.prompt,t=current('admin');const correctPlace=admin.mode===t[6];log(prompt+' '+raw);const canonical=correctPlace&&admin.matches(input,t)?t[4]:input;const r=admin.run(canonical);log(r.text);$('prompt').textContent=admin.prompt;$('command').value='';blockUI.admin.reset(t[4]);const passed=r.ok&&correctPlace&&admin.matches(input,t);record(t[0],passed);if(passed){mark(t[0]);msg('adminFeedback','正解！',true);$('adminHelp').hidden=true;explain('admin',t)}else if(!r.ok){msg('adminFeedback','実行できませんでした。上のメッセージを確認してください。',false)}else msg('adminFeedback','コマンドを実行しました。課題に合うコマンドを入力してください。')};
+for(const b of document.querySelectorAll('[data-insert]'))b.onclick=()=>{const e=$('command'),a=e.selectionStart??e.value.length,z=e.selectionEnd??a;const value=b.dataset.insert==='\\\\'?'\\':b.dataset.insert;e.setRangeText(value,a,z,'end');blockUI.admin.sync();e.focus()};$('lastCommand').onclick=()=>{$('command').value=history;blockUI.admin.sync();$('command').focus()};
 function quizTask(){const t=current('quiz'),c=correctSet(t);taskText('quizTask',t,(L.quizTopics[t[0]]||'')+' / '+c.length+'つ選択');msg('quizFeedback');const e=$('quizOptions');e.replaceChildren();let picked=[],graded=false;const order=shuffle(t[3].map((_,i)=>i));const submit=()=>{if(graded||picked.length!==c.length)return;graded=true;const ok=grade(t,picked);record(t[0],ok);if(ok)mark(t[0]);[...e.children].forEach((b,j)=>{const k=order[j];b.classList.toggle('correct',c.includes(k));b.classList.toggle('wrong',picked.includes(k)&&!c.includes(k));b.disabled=true});msg('quizFeedback',(ok?'正解！ ':'不正解。')+t[5]+usage(t)+'\n\n'+order.map((k,j)=>String.fromCharCode(65+j)+' '+(c.includes(k)?'○':'×')+' '+reason(t,k)).join('\n'),ok);$('quizSubmit').disabled=true;};
 order.forEach((k,j)=>{const b=document.createElement('button');b.textContent=String.fromCharCode(65+j)+'. '+t[3][k];b.setAttribute('aria-pressed','false');b.onclick=()=>{if(graded)return;if(c.length===1){picked=[k];submit()}else{picked=picked.includes(k)?picked.filter(x=>x!==k):[...picked,k];b.classList.toggle('selected',picked.includes(k));b.setAttribute('aria-pressed',String(picked.includes(k)));$('quizSubmit').disabled=picked.length!==c.length}};e.append(b)});$('quizSubmit').hidden=c.length===1;$('quizSubmit').disabled=true;$('quizSubmit').onclick=submit;}
 $('quizSelect').onchange=quizTask;$('quizNext').onclick=()=>next('quiz');
@@ -889,7 +1131,7 @@ $('mockStart').onclick=startMock;$('mockRestart').onclick=startMock;$('mockPrev'
 function refs(){const q=$('searchRef').value.toLowerCase().trim(),e=$('refList');e.replaceChildren();const extra=[['postgresql.conf','サーバー設定。shared_buffers、port など。'],['pg_hba.conf','クライアント認証。接続元・DB・ユーザー・認証方式。'],['pg_ident.conf','OSユーザー名とDBユーザー名のマッピング。'],['WAL','Write-Ahead Logging。データページより先にログを永続化。'],['\\d','リレーション一覧（テーブル・ビュー・シーケンス等）。'],['VACUUM FULL','テーブルを書き直し、領域をOSへ返せる。排他ロックに注意。'],['SELECT nextval(\'users_id_seq\');','シーケンスを進めて値を取得。実際のシーケンス名を指定。']];const rows=[...L.admin.map(t=>[t[4],t[1]+' / '+t[5]+(scope(t)?' / '+scope(t):'')+usage(t),t[6]]),...extra];for(const r of rows){if(!r.join(' ').toLowerCase().includes(q))continue;const d=document.createElement('div');d.className='refItem';const c=document.createElement('code');c.textContent=r[0];const s=document.createElement('small');s.textContent=(r[2]?r[2]+' · ':'')+r[1];d.append(c,s);e.append(d)}if(!e.children.length)e.textContent='該当するコマンドがありません。'}$('searchRef').oninput=refs;
 // SQL runs in a dedicated worker, keeping the mobile UI responsive.
 function setBusy(v){locked=v;$('runSQL').disabled=v;$('resetSQL').disabled=v||!(sqlLoaded||practice);$('practiceSQL').disabled=v;$('sqlSelect').disabled=v;$('sqlNext').disabled=v;$('connect').disabled=v;$('sqliteConnect').disabled=v}
-function createClient(){const worker=new Worker('./sql-worker.js?v=2.3');let seq=0,pending=new Map(),closed=false;
+function createClient(){const worker=new Worker('./sql-worker.js?v=2.4');let seq=0,pending=new Map(),closed=false;
  function fail(reason){if(closed)return;closed=true;worker.terminate();for(const p of pending.values()){clearTimeout(p.timer);p.reject(new Error(reason))}pending.clear()}
  worker.onmessage=e=>{const m=e.data,p=pending.get(m.id);if(!p)return;pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(new Error(m.error)):p.resolve(m.result)};
  worker.onerror=e=>fail(e.message||'SQLワーカーの起動に失敗');
@@ -899,10 +1141,10 @@ function createClient(){const worker=new Worker('./sql-worker.js?v=2.3');let seq
 function signature(results,ordered){return JSON.stringify(results.filter(r=>r.fields?.length).map(r=>{const values=r.rows.map(row=>JSON.stringify(Object.values(row),(_,v)=>typeof v==='bigint'?String(v):v));return [r.fields.length,ordered?values:values.sort()]}))}
 function verification(t){if(engine==='sqlite'){if(t[0]==='s19')return "SELECT name,lower(type),pk FROM pragma_table_info('notes') ORDER BY cid;";if(t[0]==='s20')return "SELECT name FROM pragma_index_info('idx_users_dept') ORDER BY seqno; SELECT name,origin FROM pragma_index_list('users') WHERE name='idx_users_dept';"}return t[6]}
 async function prep(){const t=current('sql'),verify=verification(t);if(engine==='sqlite'&&t[8])throw new Error('この課題はPostgreSQL専用です。PostgreSQLで起動するか解答チェックをご利用ください');await db.reset(L.seed);const r=await db.exec(t[4]);expected=signature(verify?await db.exec(verify):r,t[5]||!!verify);await db.reset(L.seed)}
-function sqlTask(){const t=current('sql');taskText('sqlTask',t,t[6]?'更新後のデータ・定義を照合します。':'検索結果を照合します。列名は採点対象外。');$('sqlHelp').hidden=true;$('sqlInput').value='';$('sqlOutput').replaceChildren();msg('sqlFeedback');if(sqlLoaded&&!practice)resetDB(false)}
+function sqlTask(){const t=current('sql');taskText('sqlTask',t,t[6]?'更新後のデータ・定義を照合します。':'検索結果を照合します。列名は採点対象外。');$('sqlHelp').hidden=true;$('sqlInput').value='';blockUI.sql.reset(t[4]);clearExplain('sql');$('sqlOutput').replaceChildren();msg('sqlFeedback');if(sqlLoaded&&!practice)resetDB(false)}
 $('sqlSelect').onchange=sqlTask;
 async function resetDB(show=true){if(locked)return;if(practice){$('sqlOutput').replaceChildren();msg('sqlFeedback','解答チェックをリセットしました。');return}if(!db||db.closed)return;setBusy(true);try{await prep();if(show){$('sqlOutput').replaceChildren();msg('sqlFeedback','練習用DBを初期化しました。')}}catch(e){startPractice('初期化できなかったため解答チェックに切り替えました：'+e.message)}finally{setBusy(false)}}
-$('resetSQL').onclick=()=>resetDB();$('clearSQL').onclick=()=>{$('sqlInput').value='';$('sqlInput').focus()};
+$('resetSQL').onclick=()=>resetDB();$('clearSQL').onclick=()=>{$('sqlInput').value='';blockUI.sql.reset(current('sql')[4]);$('sqlInput').focus()};
 function startPractice(reason=''){if(db)db.close();db=null;sqlLoaded=false;practice=true;engine='';$('sqlStatus').textContent='解答チェック（SQL未実行）';$('runSQL').textContent='▶ 解答をチェック';$('sqlOutput').replaceChildren();msg('sqlFeedback','このモードはSQLを実行せず、模範解答と照合します。');msg('sqlError',reason,reason?false:undefined);setBusy(false)}
 $('practiceSQL').onclick=()=>{if(!locked)startPractice()};
 async function connectEngine(kind,allowFallback=false){if(locked)return false;setBusy(true);sqlLoaded=false;practice=false;if(db)db.close();db=null;engine='';let errors=[];
@@ -915,9 +1157,9 @@ async function connectEngine(kind,allowFallback=false){if(locked)return false;se
 }
 $('connect').onclick=()=>connectEngine('postgres',false);
 $('sqliteConnect').onclick=()=>connectEngine('sqlite',false);
-for(const b of document.querySelectorAll('[data-sql-insert]')){b.addEventListener('mousedown',e=>e.preventDefault());b.onclick=()=>{const e=$('sqlInput'),a=e.selectionStart??e.value.length,z=e.selectionEnd??a;e.setRangeText(b.dataset.sqlInsert,a,z,'end');e.focus()}};
+for(const b of document.querySelectorAll('[data-sql-insert]')){b.addEventListener('mousedown',e=>e.preventDefault());b.onclick=()=>{const e=$('sqlInput'),a=e.selectionStart??e.value.length,z=e.selectionEnd??a;e.setRangeText(b.dataset.sqlInsert,a,z,'end');blockUI.sql.sync();e.focus()}};
 function drawResults(results){const out=$('sqlOutput');out.replaceChildren();for(const r of results){if(r.fields?.length){const table=document.createElement('table');const thead=table.createTHead().insertRow();for(const f of r.fields){const th=document.createElement('th');th.textContent=f.name;thead.append(th)}const body=table.createTBody();for(const row of r.rows.slice(0,200)){const tr=body.insertRow();for(const f of r.fields){const td=tr.insertCell();const v=row[f.name];td.textContent=v===null?'NULL':typeof v==='object'?JSON.stringify(v):String(v)}}out.append(table);const n=document.createElement('p');n.textContent=`${r.rows.length} 行${r.rows.length>200?'（先頭200行表示）':''}`;out.append(n)}else{const p=document.createElement('pre');p.textContent=`実行成功${r.affectedRows!==undefined?' / 影響行数: '+r.affectedRows:''}`;out.append(p)}}}
-$('runSQL').onclick=async()=>{if(locked)return;const raw=$('sqlInput').value.trim(),q=window.SQLPractice.normalize(raw),t=current('sql');if(!q){msg('sqlFeedback','SQLを入力してください。',false);return}if(!(sqlLoaded||practice)){const started=await connectEngine('postgres',true);if(!started){msg('sqlFeedback','実際のSQLは実行できませんでした。解答チェックを使う場合はもう一度押してください。',false);return}}if(practice){const ok=window.SQLPractice.matches(q,t[4]);record(t[0],ok);if(ok){mark(t[0]);msg('sqlFeedback','正解！ 模範解答と一致しました（SQL未実行）。'+usage(t),true)}else msg('sqlFeedback','模範解答と一致しません。別の正しい書き方も判定できないことがあります。ヒントを確認してください。',false);return}setBusy(true);msg('sqlFeedback');try{const r=await db.exec(q);drawResults(r);const verify=verification(t),actual=signature(verify?await db.exec(verify):r,t[5]||!!verify);const hasTransaction=t[7]!=='rollback'||(/\bbegin\b/i.test(q)&&/\bupdate\b/i.test(q)&&/\brollback\b/i.test(q));const required=t[7]==='commit'?(/\bbegin\b/i.test(q)&&/\bupdate\b/i.test(q)&&/\bcommit\b/i.test(q)):t[7]==='returning'?/\breturning\b/i.test(q):t[7]==='insert-select'?/\binsert\s+into\b[\s\S]*\bselect\b/i.test(q):true;const passed=actual===expected&&hasTransaction&&required;record(t[0],passed);if(passed){mark(t[0]);msg('sqlFeedback','正解！ 実行結果が期待値と一致しました。'+usage(t),true)}else msg('sqlFeedback','実行できましたが、課題の期待値とは一致しません。条件や列を確認してください。更新系はDB初期化して再挑戦できます。',false)}catch(e){record(t[0],false);if(db?.closed){sqlLoaded=false;$('sqlStatus').textContent='エンジン停止';}msg('sqlFeedback','SQLエラー：'+e.message+'\nトランザクションが中断された場合は ROLLBACK; またはDB初期化。',false)}finally{setBusy(false)}};
+$('runSQL').onclick=async()=>{if(locked)return;const raw=$('sqlInput').value.trim(),q=window.SQLPractice.normalize(raw),t=current('sql');if(!q){msg('sqlFeedback','SQLを入力してください。',false);return}if(!(sqlLoaded||practice)){const started=await connectEngine('postgres',true);if(!started){msg('sqlFeedback','実際のSQLは実行できませんでした。解答チェックを使う場合はもう一度押してください。',false);return}}if(practice){const ok=window.SQLPractice.matches(q,t[4]);record(t[0],ok);if(ok){mark(t[0]);msg('sqlFeedback','正解！ 模範解答と一致しました（SQL未実行）。',true);$('sqlHelp').hidden=true;explain('sql',t)}else msg('sqlFeedback','模範解答と一致しません。別の正しい書き方も判定できないことがあります。ヒントを確認してください。',false);return}setBusy(true);msg('sqlFeedback');try{const r=await db.exec(q);drawResults(r);const verify=verification(t),actual=signature(verify?await db.exec(verify):r,t[5]||!!verify);const hasTransaction=t[7]!=='rollback'||(/\bbegin\b/i.test(q)&&/\bupdate\b/i.test(q)&&/\brollback\b/i.test(q));const required=t[7]==='commit'?(/\bbegin\b/i.test(q)&&/\bupdate\b/i.test(q)&&/\bcommit\b/i.test(q)):t[7]==='returning'?/\breturning\b/i.test(q):t[7]==='insert-select'?/\binsert\s+into\b[\s\S]*\bselect\b/i.test(q):true;const passed=actual===expected&&hasTransaction&&required;record(t[0],passed);if(passed){mark(t[0]);msg('sqlFeedback','正解！ 実行結果が期待値と一致しました。',true);$('sqlHelp').hidden=true;explain('sql',t)}else msg('sqlFeedback','実行できましたが、課題の期待値とは一致しません。条件や列を確認してください。更新系はDB初期化して再挑戦できます。',false)}catch(e){record(t[0],false);if(db?.closed){sqlLoaded=false;$('sqlStatus').textContent='エンジン停止';}msg('sqlFeedback','SQLエラー：'+e.message+'\nトランザクションが中断された場合は ROLLBACK; またはDB初期化。',false)}finally{setBusy(false)}};
 $('schema').textContent='users (id integer PK, name text, age integer, dept text, email text)\norders (id integer PK, user_id integer FK → users.id, amount integer)';const schemaPre=document.createElement('pre');schemaPre.textContent='\nusers: id | name | age | dept | email\n1 | Sato | 31 | IT | sato@example.test\n2 | Suzuki | 25 | IT | NULL\n3 | Tanaka | 40 | Sales | tanaka@example.test\n4 | Yamada | 35 | Sales | NULL\n5 | Kato | 22 | HR | kato@example.test\n\norders: id | user_id | amount\n1 | 1 | 1200\n2 | 1 | 800\n3 | 2 | 500\n4 | 3 | 3000\n5 | 4 | 1500';$('schema').append(schemaPre);
 adminTask();sqlTask();quizTask();refs();progress();renderStats();$('startupNotice').hidden=true;
 if(location.protocol==='https:'&&'serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{$('offlineStatus').textContent='基本機能をオフライン保存済み（SQL実行は通信が必要な場合あり）。'}).catch(()=>{$('offlineStatus').textContent='オフライン保存に失敗。オンラインで使用できます。'})}else $('offlineStatus').textContent='GitHub Pagesで公開すると基本機能をオフライン保存できます。';
