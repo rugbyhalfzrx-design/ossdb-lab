@@ -21,4 +21,4 @@ assert(!extended.run('pg_resetwal -f /var/lib/postgresql/data').ok);assert(exten
 assert(extended.run('pg_ctl -D /var/lib/postgresql/data -l server.log start').ok);assert(extended.files.has('server.log'));
 assert.equal(Object.keys(LESSONS.adminScope).length,10);
 
-assert.equal(LESSONS.admin.length,110);assert.equal(LESSONS.sql.length,75);assert.equal(LESSONS.quiz.length,235);
+assert.equal(LESSONS.admin.length,110);assert.equal(LESSONS.sql.length,80);assert.equal(LESSONS.quiz.length,240);

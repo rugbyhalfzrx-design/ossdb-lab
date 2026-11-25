@@ -21,4 +21,4 @@ const assert=require('node:assert/strict');global.window=global;require('../less
  input.value='';ui.reset('pg_dump -d lab');assert.equal(nodes.bank.children.length,3);assert.equal(input.value,'');
  const second=B.create(el(),root,storage,'test',{createElement:el},()=>0.999);assert(second.visible());
 })(assert,LESSONS,AdminLab,SQLPractice,CommandBlocks);
-console.log('185 block round-trips and interaction checks passed.');
+console.log('190 block round-trips and interaction checks passed.');
