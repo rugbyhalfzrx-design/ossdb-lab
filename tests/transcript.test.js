@@ -6,3 +6,5 @@ const assert=require('node:assert/strict');global.window=global;require('../less
  const lab=new AdminLab(get('a01'));assert(lab.run('psql -d lab').ok);assert(lab.run('\\o result.txt').ok);assert.equal(lab.run('SHOW port;').text,'');assert(lab.run('\\o').ok);assert(lab.run('SHOW port;').text.includes('5432'));assert(lab.run('\\timing on').ok);assert(lab.run('SHOW port;').text.includes('Time:'));assert(lab.run('\\timing off').ok);assert(!lab.run('SHOW port;').text.includes('Time:'));
 })(assert,LESSONS,AdminLab);
 console.log('All administration transcripts and output-state tests passed.');
+
+const di=new AdminLab(LESSONS.admin.find(t=>t[0]==='a58')).run('\\di');assert(di.text.includes('users_pkey')&&di.text.includes('Table'));assert(di.notes.some(x=>x.includes('\\d users')));assert(LESSONS.beginner.a58.includes('10万件'));assert(LESSONS.usage.a58.includes('EXPLAIN'));
