@@ -14,8 +14,8 @@ function grade(t,chosen){const c=correctSet(t);return chosen.length===c.length&&
 function glossary(t){const source=[t[1],t[2],typeof t[5]==='string'?t[5]:'',L.usage?.[t[0]]||''].join(' ');const items=(L.glossary||[]).filter(([word])=>source.toLowerCase().includes(word.toLowerCase())).filter(([word],i,all)=>!all.some(([other],j)=>i!==j&&other.includes(word))).slice(0,3);return items.length?'\n\n【用語の意味】\n'+items.map(([word,meaning])=>word+'：'+meaning).join('\n'):''}
 function usage(t){return L.usage?.[t[0]]?'\n\n【いつ使う？】\n'+L.usage[t[0]]+glossary(t):'';}
 const blockUI={admin:window.CommandBlocks.create($('command'),$('adminBlocks'),localStorage,KEY+'-admin-blocks'),sql:window.CommandBlocks.create($('sqlInput'),$('sqlBlocks'),localStorage,KEY+'-sql-blocks')};
-function explain(g,t){const e=$(g+'Explanation');e.hidden=false;e.textContent='【解答】\n'+t[4]+'\n\n【何をする？】\n'+(L.beginner?.[t[0]]||(g==='admin'?t[5]:t[1]))+usage(t)}
-function clearExplain(g){const e=$(g+'Explanation');e.hidden=true;e.textContent=''}
+function explain(g,t){const e=$(g+'Explanation');e.hidden=false;$(g+'NextBottom').hidden=false;e.textContent='【解答】\n'+t[4]+'\n\n【何をする？】\n'+(L.beginner?.[t[0]]||(g==='admin'?t[5]:t[1]))+usage(t)}
+function clearExplain(g){const e=$(g+'Explanation');e.hidden=true;e.textContent='';$(g+'NextBottom').hidden=true}
 
 function reason(t,i){return L.quizExplanations[t[0]]?.[i]||(correctSet(t).includes(i)?t[5]:'この問いの条件とは一致しません。'+t[5])}
 function chooseTask(g,filter){if(g==='sql'&&locked)return;const idx=L[g].map((t,i)=>({t,i})).filter(x=>filter(x.t));if(!idx.length){msg(g+'Feedback','該当する問題がありません。');return}const s=$(g+'Select'),pool=idx.filter(x=>x.i!==Number(s.value));s.value=String(shuffle(pool.length?pool:idx)[0].i);s.dispatchEvent(new Event('change'))}
@@ -25,10 +25,10 @@ function mark(id){done.add(id);try{localStorage.setItem(KEY,JSON.stringify([...d
 function msg(id,text='',ok){const e=$(id);e.textContent=text;e.className='feedback'+(text&&ok!==undefined?(ok?' ok':' bad'):'')}
 function current(g){return L[g][Number($(g+'Select').value)||0]}
 function setupSelect(g){const s=$(g+'Select');let chapter='',group=s;L[g].forEach((t,i)=>{const label=L.chapters?.[g]?.[t[0]]||'';if(label&&label!==chapter){group=document.createElement('optgroup');group.label=label;s.append(group);chapter=label}const o=document.createElement('option');o.value=i;o.textContent=t[1];group.append(o)});s.value=String(Math.max(0,L[g].findIndex(t=>!done.has(t[0]))))}
-function next(g){const s=$(g+'Select');s.value=(Number(s.value)+1)%L[g].length;s.dispatchEvent(new Event('change'))}
+function next(g){if(g==='sql'&&locked)return;const s=$(g+'Select');s.value=(Number(s.value)+1)%L[g].length;s.dispatchEvent(new Event('change'))}
 function taskText(id,t,sub){const e=$(id);e.textContent=t[2];const g=id.replace(/Task$/,'');const chapter=L.chapters?.[g]?.[t[0]];if(chapter||sub){const x=document.createElement('small');x.textContent=[chapter,sub].filter(Boolean).join(' / ');e.append(x)}}
 function help(g,answer){const t=current(g),e=$(g+'Help');if(answer){e.hidden=true;e.textContent='';explain(g,t);$(g+'Explanation').scrollIntoView({block:'nearest',behavior:'smooth'});}else{e.hidden=false;e.textContent='ヒント：'+t[3];}}
-for(const g of ['admin','sql','quiz'])setupSelect(g);for(const g of ['admin','sql']){ $(g+'Hint').onclick=()=>help(g,false);$(g+'Answer').onclick=()=>help(g,true);$(g+'Next').onclick=()=>next(g)}
+for(const g of ['admin','sql','quiz'])setupSelect(g);for(const g of ['admin','sql']){ $(g+'Hint').onclick=()=>help(g,false);$(g+'Answer').onclick=()=>help(g,true);$(g+'Next').onclick=()=>next(g);$(g+'NextBottom').onclick=()=>{next(g);$(g+'Task').scrollIntoView({block:'center',behavior:'smooth'})}}
 for(const b of document.querySelectorAll('nav button'))b.onclick=()=>{for(const x of document.querySelectorAll('nav button')){x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',x===b?'true':'false');$(x.dataset.tab).hidden=x!==b}};
 $('resetProgress').onclick=()=>{if(confirm('すべての正解記録を消しますか？')){done.clear();try{localStorage.removeItem(KEY);localStorage.removeItem(STATS)}catch{}attempts={};renderStats();progress()}};
 function log(s){const e=$('terminalLog');e.textContent+=(e.textContent?'\n':'')+s;e.scrollTop=e.scrollHeight}
@@ -49,8 +49,8 @@ function finishMock(){if(!mock||mock.finished)return;const missing=mock.question
 $('mockStart').onclick=startMock;$('mockRestart').onclick=startMock;$('mockPrev').onclick=()=>{if(mock.i>0){mock.i--;drawMock()}};$('mockNext').onclick=()=>{if(mock.i<mock.questions.length-1){mock.i++;drawMock()}};$('mockFinish').onclick=finishMock;
 function refs(){const q=$('searchRef').value.toLowerCase().trim(),e=$('refList');e.replaceChildren();const extra=[['postgresql.conf','サーバー設定。shared_buffers、port など。'],['pg_hba.conf','クライアント認証。接続元・DB・ユーザー・認証方式。'],['pg_ident.conf','OSユーザー名とDBユーザー名のマッピング。'],['WAL','Write-Ahead Logging。データページより先にログを永続化。'],['\\d','リレーション一覧（テーブル・ビュー・シーケンス等）。'],['VACUUM FULL','テーブルを書き直し、領域をOSへ返せる。排他ロックに注意。'],['SELECT nextval(\'users_id_seq\');','シーケンスを進めて値を取得。実際のシーケンス名を指定。']];const rows=[...L.admin.map(t=>[t[4],t[1]+' / '+t[5]+(scope(t)?' / '+scope(t):'')+usage(t),t[6]]),...extra];for(const r of rows){if(!r.join(' ').toLowerCase().includes(q))continue;const d=document.createElement('div');d.className='refItem';const c=document.createElement('code');c.textContent=r[0];const s=document.createElement('small');s.textContent=(r[2]?r[2]+' · ':'')+r[1];d.append(c,s);e.append(d)}if(!e.children.length)e.textContent='該当するコマンドがありません。'}$('searchRef').oninput=refs;
 // SQL runs in a dedicated worker, keeping the mobile UI responsive.
-function setBusy(v){locked=v;$('runSQL').disabled=v;$('resetSQL').disabled=v||!(sqlLoaded||practice);$('practiceSQL').disabled=v;$('sqlSelect').disabled=v;$('sqlNext').disabled=v;$('connect').disabled=v;$('sqliteConnect').disabled=v}
-function createClient(){const worker=new Worker('./sql-worker.js?v=2.4');let seq=0,pending=new Map(),closed=false;
+function setBusy(v){locked=v;$('runSQL').disabled=v;$('resetSQL').disabled=v||!(sqlLoaded||practice);$('practiceSQL').disabled=v;$('sqlSelect').disabled=v;$('sqlNext').disabled=v;$('sqlNextBottom').disabled=v;$('connect').disabled=v;$('sqliteConnect').disabled=v}
+function createClient(){const worker=new Worker('./sql-worker.js?v=2.5');let seq=0,pending=new Map(),closed=false;
  function fail(reason){if(closed)return;closed=true;worker.terminate();for(const p of pending.values()){clearTimeout(p.timer);p.reject(new Error(reason))}pending.clear()}
  worker.onmessage=e=>{const m=e.data,p=pending.get(m.id);if(!p)return;pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(new Error(m.error)):p.resolve(m.result)};
  worker.onerror=e=>fail(e.message||'SQLワーカーの起動に失敗');
