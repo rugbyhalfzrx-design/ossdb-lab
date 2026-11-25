@@ -4,11 +4,13 @@
 .startup-notice{background:#fff3d2;border:1px solid #e2bf62;border-radius:10px;padding:12px;margin-bottom:12px;font-size:14px} .startup-notice[hidden]{display:none!important} .actions button{min-height:44px} input,textarea,select{font-size:16px} .feedback{overflow-wrap:anywhere}
 nav{grid-template-columns:repeat(5,minmax(0,1fr))}nav button{font-size:12px}.options button.selected{background:#e1edff;border-color:#235caa;color:#123f7a}.options button.correct{background:#e3f4f0;border-color:#087c70;color:#07594d}.options button.wrong{background:#fff0ed;border-color:#b44336;color:#85291d}.options button:disabled{opacity:1}#accuracy,#quizReviewCount{line-height:1.7}#mockReview details{white-space:normal}#mockReview pre{margin-top:8px}.actions small{align-self:center;color:var(--muted)}
 
-/* v2.5 command blocks */
+/* v2.6 command blocks */
 .block-tool{margin:12px 0;border:1px solid var(--line);border-radius:12px;padding:10px;background:#f8fafc}.block-mode{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:#e6edf5;padding:3px;border-radius:11px}.block-mode button{background:transparent;border:0;color:var(--muted);font-size:13px;min-height:40px}.block-mode button[aria-pressed="true"]{background:white;color:var(--blue);box-shadow:0 1px 4px #173b5220}.block-tool p{margin:9px 0;font-size:12px}.block-caption{font-size:12px;color:var(--muted);font-weight:700;margin:8px 0 4px}.block-bank,.block-selected{display:flex;flex-wrap:wrap;gap:6px;min-height:43px}.block-selected{border:1px dashed #b3c5d6;padding:6px;border-radius:9px;background:white}.word-block,.chosen-block{font:13px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;min-height:44px;max-width:100%;overflow-wrap:anywhere;text-align:left;white-space:pre-wrap;border:1px solid #b8cde5;background:white;color:#1a4a7f;padding:8px 10px}.chosen-block{background:#dff3ef;border-color:#8acfc0;color:#08695d}.block-empty{font-size:12px;color:var(--muted);align-self:center}.explanation{margin-top:12px;padding:14px;border:1px solid #c9dce9;border-radius:12px;background:#f2f7fc;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8}.refItem small{white-space:pre-wrap}
 
 
 .next-bottom{display:block;width:100%;margin:12px 0 0;min-height:48px;font-size:15px}
+
+.option-heading{font-size:16px;margin:16px 0 4px;padding:8px 10px;background:#e6edf5;border-radius:8px}.option-entry{padding:12px 4px;border-bottom:1px solid var(--line)}.option-entry strong{display:block;font-size:15px;color:var(--blue)}.option-entry small{display:block;color:var(--muted);font:12px monospace}.option-entry p{margin:6px 0;font-size:14px;color:var(--ink)}.option-entry code{display:block;background:#f1f5f9;padding:8px;border-radius:7px;font-size:13px;overflow-wrap:anywhere;white-space:pre-wrap}.option-entry small:empty{display:none}
 </style></head><body>
 <header><div class="brand"><span class="logo">DB</span><div><small>POSTGRESQL / SILVER</small><h1>OSS-DB Lab</h1></div></div><button id="resetProgress" class="ghost small">記録リセット</button></header>
 <main><div id="startupNotice" class="startup-notice">この画面が消えない場合はJavaScriptが動いていません。ファイルのプレビューではなく、GitHub Pagesで公開したURLをSafariで開いてください。</div><section class="hero"><div class="eyebrow">YOUR STUDY PROGRESS</div><div class="heroLine"><h2 id="progressText">0 / 0</h2><span id="percent">0%</span></div><div class="track"><div id="bar"></div></div><p id="progressDetail"></p></section>
@@ -16,8 +18,8 @@ nav{grid-template-columns:repeat(5,minmax(0,1fr))}nav button{font-size:12px}.opt
 <section id="admin" class="panel"><div class="sectionHead"><div><div class="eyebrow">01 / ADMIN LAB</div><h2>運用管理ターミナル</h2></div><span class="tag">模擬環境</span></div><p>Linux・psqlの操作を安全に練習。実際のサーバーやファイルは変更しません。Linuxコマンドとオプション、psqlメタコマンドは大文字・小文字を区別します。</p><p>「試験範囲外・実務向け」はOS固有の操作です。「関連知識」は試験用語に関連する補足です。すべて練習・進捗記録できます。</p><p>上から順に学習すると、環境確認→起動→接続→確認→運用→バックアップ→停止の流れを練習できます。lab DBは準備済みで、課題ごとに環境が初期化されます。systemctlはpg_ctlとは別のOSサービス管理方法です。</p><div class="controls"><label for="adminSelect">練習する課題</label><select id="adminSelect"></select></div><div class="task"><div id="adminTask"></div><div class="actions"><button id="adminHint" class="ghost">ヒント</button><button id="adminAnswer" class="ghost">解答を見る</button><button id="adminNext" class="ghost">次の課題 ›</button><button id="adminRandom" class="ghost">ランダム</button><button id="adminWrong" class="ghost">間違い復習</button><small id="adminReviewCount"></small></div><div id="adminHelp" class="help" hidden></div></div><div class="terminal"><div class="termhead"><span>● ● ●</span><span>postgres@lab</span><button id="clearTerm">表示クリア</button></div><pre id="terminalLog" aria-live="polite"></pre><form id="commandForm"><label id="prompt" for="command">$</label><input id="command" placeholder="コマンドを入力" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go"><button type="submit">実行</button></form></div><div id="adminBlocks" class="block-tool"><div class="block-mode" role="group" aria-label="入力ブロックの表示"><button type="button" data-hide aria-pressed="true">手入力のみ</button><button type="button" data-show aria-pressed="false">ブロック表示</button></div><div data-panel hidden><p>順番を考えてタップ。入力欄はいつでも直接編集できます。</p><div class="block-caption">選んだ順番（タップで取り消し）</div><div data-selected class="block-selected"></div><div class="block-caption">選択できるブロック</div><div data-bank class="block-bank"></div><div class="actions"><button type="button" data-undo class="ghost">1つ戻す</button><button type="button" data-clear class="ghost">入力をクリア</button></div></div></div><div class="actions shortcuts"><button data-insert="\\">\</button><button data-insert=";">;</button><button data-insert="-">-</button><button data-insert="/">/</button><button id="lastCommand">履歴 ↑</button><button id="resetLab" class="ghost">環境リセット</button></div><div id="adminFeedback" class="feedback" aria-live="polite"></div><div id="adminExplanation" class="explanation" aria-live="polite" hidden></div><button id="adminNextBottom" type="button" class="primary next-bottom" hidden>次の課題へ ›</button></section>
 <section id="sql" class="panel" hidden><div class="sectionHead"><div><div class="eyebrow">02 / SQL LAB</div><h2>PostgreSQL 実践</h2></div><span class="tag" id="sqlStatus">実行で起動</span></div><p>SQLを入力して実行すると自動起動します。PostgreSQL優先、起動失敗時はSQLite（文法に一部違いあり）。初回は通信が必要です。既存の練習用テーブルで検索を覚えた後、DDL・データ更新・トランザクションへ進みます。課題ごとにデータは初期化されます。全角・半角、SQLキーワードの大小文字は同じ扱いです。コロン「:」はセミコロン「;」の代用にはなりません。文字列の大小文字は区別します。</p><div class="actions"><button id="connect" class="primary">PostgreSQLを起動</button><button id="sqliteConnect" class="ghost">SQLiteで起動</button><button id="practiceSQL" class="ghost">解答チェック（通信不要）</button></div><div id="sqlError" class="feedback" aria-live="polite"></div><details><summary>練習用テーブル・初期データ</summary><div id="schema"></div></details><label for="sqlSelect">練習する課題</label><select id="sqlSelect"></select><div class="task"><div id="sqlTask"></div><div class="actions"><button id="sqlHint" class="ghost">ヒント</button><button id="sqlAnswer" class="ghost">解答を見る</button><button id="sqlNext" class="ghost">次の課題 ›</button><button id="sqlRandom" class="ghost">ランダム</button><button id="sqlWrong" class="ghost">間違い復習</button><small id="sqlReviewCount"></small></div><div id="sqlHelp" class="help" hidden></div></div><label for="sqlInput">SQL エディタ</label><textarea id="sqlInput" rows="5" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="SELECT * FROM users;"></textarea><div id="sqlBlocks" class="block-tool"><div class="block-mode" role="group" aria-label="入力ブロックの表示"><button type="button" data-hide aria-pressed="true">手入力のみ</button><button type="button" data-show aria-pressed="false">ブロック表示</button></div><div data-panel hidden><p>順番を考えてタップ。入力欄はいつでも直接編集できます。</p><div class="block-caption">選んだ順番（タップで取り消し）</div><div data-selected class="block-selected"></div><div class="block-caption">選択できるブロック</div><div data-bank class="block-bank"></div><div class="actions"><button type="button" data-undo class="ghost">1つ戻す</button><button type="button" data-clear class="ghost">入力をクリア</button></div></div></div><div class="actions shortcuts" aria-label="SQL記号入力"><button type="button" class="ghost" data-sql-insert=";" aria-label="セミコロンを入力">;</button><button type="button" class="ghost" data-sql-insert="\" aria-label="バックスラッシュを入力">\</button><button type="button" class="ghost" data-sql-insert="*" aria-label="アスタリスクを入力">*</button><button type="button" class="ghost" data-sql-insert="'" aria-label="シングルクォートを入力">'</button><button type="button" class="ghost" data-sql-insert="(" aria-label="左括弧を入力">(</button><button type="button" class="ghost" data-sql-insert=")" aria-label="右括弧を入力">)</button></div><div class="actions"><button id="runSQL" class="primary">▶ 実行・採点</button><button id="resetSQL" class="ghost" disabled>DB初期化</button><button id="clearSQL" class="ghost">クリア</button></div><div id="sqlFeedback" class="feedback" aria-live="polite"></div><div id="sqlOutput" class="output" aria-live="polite"></div><div id="sqlExplanation" class="explanation" aria-live="polite" hidden></div><button id="sqlNextBottom" type="button" class="primary next-bottom" hidden>次の課題へ ›</button></section>
 <section id="quiz" class="panel" hidden><div class="eyebrow">03 / KNOWLEDGE CHECK</div><h2>確認問題</h2><p>一般知識→運用管理→SQLの試験分野順に復習。分野別正答率は確認問題と模試の回答履歴から計算します。</p><div class="task"><small id="accuracy"></small><small id="quizReviewCount"></small><details><summary>公式10分野の習熟状況</summary><p>確認問題・模試の回答済数と直近正解数（各問題の最後の回答が正解だった数）です。</p><div id="topicStats"></div></details></div><label for="quizFilter">ランダム・復習の分野</label><select id="quizFilter"><option value="all">全分野</option><option value="S1">一般知識</option><option value="S2">運用管理</option><option value="S3">開発・SQL</option><optgroup label="公式10分野"><option value="S1.1">S1.1 OSSとPostgreSQLの一般知識</option><option value="S1.2">S1.2 リレーショナルDBとSQL基礎</option><option value="S2.1">S2.1 クラスタ・データ保存</option><option value="S2.2">S2.2 起動・停止・標準ツール・psql</option><option value="S2.3">S2.3 接続・認証・設定・ログ</option><option value="S2.4">S2.4 バックアップ・リストア・WAL</option><option value="S2.5">S2.5 ロールと日常保守</option><option value="S3.1">S3.1 SQLとDBオブジェクト</option><option value="S3.2">S3.2 関数</option><option value="S3.3">S3.3 トランザクションとMVCC</option></optgroup></select><div class="actions"><button id="quizRandom" class="primary">ランダム出題</button><button id="quizWrong" class="ghost">間違い復習</button></div><label for="quizSelect">問題を選ぶ</label><select id="quizSelect"></select><div class="task" id="quizTask"></div><div id="quizOptions" class="options"></div><div id="quizFeedback" class="feedback" aria-live="polite"></div><div class="actions"><button id="quizSubmit" class="primary" hidden>選択を採点</button><button id="quizNext" class="primary">次の問題 ›</button></div></section>
-<section id="mock" class="panel" hidden><div class="eyebrow">04 / MOCK EXAM</div><h2>50問模擬試験</h2><div id="mockIntro"><p>一般8問・運用26問・SQL16問を公式10分野の重要度に合わせてランダム出題。解説と採点は終了後に表示。制限時間なし。ページを再読み込みすると受験中の回答は消えます。</p><button id="mockStart" class="primary">模試を開始</button></div><div id="mockBody" hidden><p id="mockCounter"></p><div id="mockQuestion" class="task"></div><div id="mockOptions" class="options"></div><div class="actions"><button id="mockPrev" class="ghost">前へ</button><button id="mockNext" class="primary">次へ</button><button id="mockFinish" class="ghost">終了・採点</button></div></div><div id="mockResult" hidden><h2 id="mockScore"></h2><p id="mockBreakdown"></p><button id="mockRestart" class="primary">別の模試を開始</button><div id="mockReview"></div></div></section><section id="ref" class="panel" hidden><div class="eyebrow">04 / REFERENCE</div><h2>コマンド早見表</h2><p>入力する場所にも注意。ターミナルとpsqlは別の環境です。</p><input id="searchRef" type="search" placeholder="pg_dump / シーケンス など" aria-label="早見表を検索"><div id="refList"></div></section>
-<footer>非公式のOSS-DB Silver学習教材 · v2.5<br>進捗は端末のブラウザに保存。SQLデータ・模擬環境は再読込で初期化されます。<br><span id="offlineStatus">公開ページでオフライン保存に対応します。</span></footer></main><script>
+<section id="mock" class="panel" hidden><div class="eyebrow">04 / MOCK EXAM</div><h2>50問模擬試験</h2><div id="mockIntro"><p>一般8問・運用26問・SQL16問を公式10分野の重要度に合わせてランダム出題。解説と採点は終了後に表示。制限時間なし。ページを再読み込みすると受験中の回答は消えます。</p><button id="mockStart" class="primary">模試を開始</button></div><div id="mockBody" hidden><p id="mockCounter"></p><div id="mockQuestion" class="task"></div><div id="mockOptions" class="options"></div><div class="actions"><button id="mockPrev" class="ghost">前へ</button><button id="mockNext" class="primary">次へ</button><button id="mockFinish" class="ghost">終了・採点</button></div></div><div id="mockResult" hidden><h2 id="mockScore"></h2><p id="mockBreakdown"></p><button id="mockRestart" class="primary">別の模試を開始</button><div id="mockReview"></div></div></section><section id="ref" class="panel" hidden><div class="eyebrow">04 / REFERENCE</div><h2>早見表</h2><div class="block-mode" role="group" aria-label="早見表の種類"><button type="button" id="refCommandMode" aria-pressed="true">コマンド</button><button type="button" id="refOptionMode" aria-pressed="false">オプション</button></div><div id="commandReference"><p>入力する場所にも注意。ターミナルとpsqlは別の環境です。</p><input id="searchRef" type="search" placeholder="pg_dump / シーケンス など" aria-label="早見表を検索"><div id="refList"></div></div><div id="optionReference" hidden><p>試験・実務でよく使う主要オプションをコマンド別にまとめました。同じ文字でもコマンドによって意味が違います。大文字・小文字も区別します。実行例は学習用で、端末では自動実行しません。</p><label for="optionGroup">コマンドで絞り込む</label><select id="optionGroup"><option value="all">すべてのコマンド</option></select><label for="optionSearch">オプション名・意味で検索</label><input id="optionSearch" type="search" placeholder="-w / pg_dump / バックアップ" autocapitalize="off" aria-label="オプション検索"><p id="optionCount" aria-live="polite"></p><div id="optionNote" class="explanation" hidden></div><div id="optionList"></div><p>参考：<a href="https://www.postgresql.org/docs/14/reference-client.html" target="_blank" rel="noopener noreferrer">PostgreSQL 14 公式コマンドリファレンス</a>。主要項目の抜粋であり、全オプションや出題範囲を保証するものではありません。</p></div></section>
+<footer>非公式のOSS-DB Silver学習教材 · v2.6<br>進捗は端末のブラウザに保存。SQLデータ・模擬環境は再読込で初期化されます。<br><span id="offlineStatus">公開ページでオフライン保存に対応します。</span></footer></main><script>
 /* 問題データ。idは進捗保存に使うので、既存のidは変更しないこと。 */
 window.LESSONS = {
 admin: [
@@ -772,7 +774,7 @@ window.LESSONS.usage = {
   "q150": "同時更新を含む業務処理で一貫性を保ち、トランザクションの失敗に対処する。"
 };
 
-/* v2.5: beginner explanations, examples and glossary */
+/* v2.6: beginner explanations, examples and glossary */
 window.LESSONS.beginner = {
   "a01": "psqlは、PostgreSQLに話しかけるためのアプリです。-Uの後ろにユーザー名、-dの後ろに接続したいデータベース名を書きます。Linuxのターミナルで実行すると、SQLを入力できる画面に入ります。",
   "a02": "テーブルとは、Excelの表のようにデータを行と列で保存するものです。\\dtを入力すると、今のDBで見えるテーブル名が一覧になります。",
@@ -1081,6 +1083,736 @@ window.CommandBlocks={parts,join,shuffled,create};
 })();
 
 </script><script>
+/* PostgreSQL 14 standard command-line tools: selected study options */
+window.OPTION_REFERENCE={
+  "data": {
+    "pg_ctl": [
+      [
+        "-D",
+        "--pgdata",
+        "保存先",
+        "操作対象のDBクラスタのデータディレクトリを指定。PGDATAが設定済みなら省略可能。",
+        "pg_ctl -D /var/lib/postgresql/data status"
+      ],
+      [
+        "-w",
+        "--wait",
+        "完了待ち",
+        "起動・停止・再起動の完了を待つ。標準動作なので通常は省略可能。バッチでも明示することがある。",
+        "pg_ctl -w start"
+      ],
+      [
+        "-W",
+        "--no-wait",
+        "待たない",
+        "起動などを指示したら完了を待たずに戻る。後続SQLの前に別途接続可能か確認する。",
+        "pg_ctl -W start"
+      ],
+      [
+        "-t",
+        "--timeout",
+        "待機時間",
+        "完了を待つ上限を秒で指定。PGCTLTIMEOUT未設定なら既定60秒。時間切れでもサーバー側の処理が続く場合がある。",
+        "pg_ctl -t 30 start"
+      ],
+      [
+        "-l",
+        "--log",
+        "起動ログ",
+        "サーバーの出力を指定ファイルに追記する。起動失敗の原因調査に便利。",
+        "pg_ctl -l server.log start"
+      ],
+      [
+        "-m",
+        "--mode",
+        "停止方法",
+        "smart（接続終了を待つ）、fast（接続を切って安全に停止・既定）、immediate（強制停止・次回復旧処理）を選ぶ。",
+        "pg_ctl stop -m fast"
+      ],
+      [
+        "-s",
+        "--silent",
+        "表示を抑える",
+        "通常の進行メッセージを減らす。エラーは表示する。",
+        "pg_ctl -s status"
+      ],
+      [
+        "-o",
+        "--options",
+        "サーバー起動オプション",
+        "postgresへ起動オプションを渡す。例では一時的にポートを5433にする。",
+        "pg_ctl -o '-p 5433' start"
+      ]
+    ],
+    "psql": [
+      [
+        "-d",
+        "--dbname",
+        "DB名",
+        "接続したいデータベースを指定。",
+        "psql -d lab"
+      ],
+      [
+        "-U",
+        "--username",
+        "DBユーザー",
+        "接続時に使用するDBロール名を指定。",
+        "psql -U postgres -d lab"
+      ],
+      [
+        "-h",
+        "--host",
+        "接続先",
+        "DBサーバーのホスト名またはIPアドレスなどを指定。",
+        "psql -h localhost -d lab"
+      ],
+      [
+        "-p",
+        "--port",
+        "ポート番号",
+        "接続するポートを指定。標準は通常5432。",
+        "psql -p 5432 -d lab"
+      ],
+      [
+        "-c",
+        "--command",
+        "単発実行",
+        "SQLや1つのメタコマンドを実行して終了。件数確認などのバッチに便利。",
+        "psql -d lab -c 'SELECT COUNT(*) FROM users;'"
+      ],
+      [
+        "-f",
+        "--file",
+        "SQLファイル",
+        "ファイル内のSQLを実行して終了。初期化・移行・定期処理に使う。",
+        "psql -d lab -f setup.sql"
+      ],
+      [
+        "-v",
+        "--set / --variable",
+        "変数設定",
+        "psqlの変数を設定。ON_ERROR_STOP=1ならSQLエラー時に処理を止める。",
+        "psql -v ON_ERROR_STOP=1 -d lab -f setup.sql"
+      ],
+      [
+        "-w",
+        "--no-password",
+        "パスワード入力なし",
+        "パスワードを対話入力しない。認証情報が必要なら.pgpassなどを安全に設定する。",
+        "psql -w -d lab"
+      ],
+      [
+        "-W",
+        "--password",
+        "パスワード入力",
+        "接続前にパスワード入力を促す。",
+        "psql -W -d lab"
+      ],
+      [
+        "-X",
+        "--no-psqlrc",
+        "初期設定を読まない",
+        "個人のpsql設定の影響を避ける。バッチや復元の再現性向上に便利。",
+        "psql -X -d lab -f setup.sql"
+      ],
+      [
+        "-o",
+        "--output",
+        "結果出力先",
+        "問い合わせ結果を指定ファイルに書き出す。",
+        "psql -d lab -o result.txt -c 'SELECT * FROM users;'"
+      ],
+      [
+        "-A",
+        "--no-align",
+        "整形なし",
+        "表の幅を揃えない形式で出力。機械処理しやすくする。",
+        "psql -A -d lab -c 'SELECT * FROM users;'"
+      ],
+      [
+        "-t",
+        "--tuples-only",
+        "行だけ",
+        "列名や件数などを省いて値を出す。シェル変数へ結果を取り込むときに便利。",
+        "psql -At -d lab -c 'SELECT COUNT(*) FROM users;'"
+      ],
+      [
+        "-F",
+        "--field-separator",
+        "区切り文字",
+        "非整列出力の列の区切り文字を指定する。CSVなら--csvも検討する。",
+        "psql -A -F '|' -d lab -c 'SELECT * FROM users;'"
+      ],
+      [
+        "-1",
+        "--single-transaction",
+        "一括トランザクション",
+        "-c/-fの処理全体を1つのトランザクションで囲む。ON_ERROR_STOP=1を併用すると失敗時に取り消せる。",
+        "psql -1 -v ON_ERROR_STOP=1 -d lab -f setup.sql"
+      ],
+      [
+        "-V",
+        "--version",
+        "クライアント版",
+        "手元のpsqlの版を表示。DBサーバー版とは別。",
+        "psql -V"
+      ]
+    ],
+    "pg_dump": [
+      [
+        "-d",
+        "--dbname",
+        "対象DB",
+        "バックアップするDB名。",
+        "pg_dump -d lab -f lab.sql"
+      ],
+      [
+        "-f",
+        "--file",
+        "出力先",
+        "バックアップを保存するファイル名またはディレクトリ名。",
+        "pg_dump -d lab -f lab.sql"
+      ],
+      [
+        "-F",
+        "--format",
+        "形式選択",
+        "p=SQL（既定）、c=カスタム、d=ディレクトリ、t=tar。SQL形式はpsql、他はpg_restoreで復元。",
+        "pg_dump -Fc -d lab -f lab.dump"
+      ],
+      [
+        "-Fp",
+        "--format=plain",
+        "SQL形式",
+        "SQL文として出力。中身をテキストで読める。",
+        "pg_dump -Fp -d lab -f lab.sql"
+      ],
+      [
+        "-Fc",
+        "--format=custom",
+        "カスタム形式",
+        "復元時に対象を選びやすい専用形式。通常は圧縮される。",
+        "pg_dump -Fc -d lab -f lab.dump"
+      ],
+      [
+        "-Fd",
+        "--format=directory",
+        "ディレクトリ形式",
+        "複数ファイルで保存。並列ダンプに対応。出力先は存在しないディレクトリを指定。",
+        "pg_dump -Fd -d lab -f labdir"
+      ],
+      [
+        "-Ft",
+        "--format=tar",
+        "tar形式",
+        "tarアーカイブで保存する。",
+        "pg_dump -Ft -d lab -f lab.tar"
+      ],
+      [
+        "-s",
+        "--schema-only",
+        "定義だけ",
+        "CREATE TABLEなどの構造のみ保存。行データは含まない。",
+        "pg_dump -s -d lab -f schema.sql"
+      ],
+      [
+        "-a",
+        "--data-only",
+        "データだけ",
+        "表の行やシーケンス値などのデータを保存。定義は含まない。",
+        "pg_dump -a -d lab -f data.sql"
+      ],
+      [
+        "-t",
+        "--table",
+        "表指定",
+        "特定のテーブルなどに絞る。関連オブジェクトの依存関係に注意。",
+        "pg_dump -t users -d lab -f users.sql"
+      ],
+      [
+        "-n",
+        "--schema",
+        "スキーマ指定",
+        "指定したスキーマに絞ってバックアップする。",
+        "pg_dump -n public -d lab -f public.sql"
+      ],
+      [
+        "-j",
+        "--jobs",
+        "並列処理",
+        "複数の作業でバックアップする。pg_dumpではディレクトリ形式のみ対応。",
+        "pg_dump -Fd -j 4 -d lab -f labdir"
+      ],
+      [
+        "-v",
+        "--verbose",
+        "詳細表示",
+        "処理の進み具合などを標準エラー出力へ表示する。",
+        "pg_dump -v -d lab -f lab.sql"
+      ],
+      [
+        "-h",
+        "--host",
+        "接続先",
+        "バックアップ元DBのホスト。",
+        "pg_dump -h localhost -d lab -f lab.sql"
+      ],
+      [
+        "-p",
+        "--port",
+        "ポート",
+        "バックアップ元DBのポート。",
+        "pg_dump -p 5432 -d lab -f lab.sql"
+      ],
+      [
+        "-U",
+        "--username",
+        "DBユーザー",
+        "バックアップに使用するDBユーザー。必要な読取権限を持つこと。",
+        "pg_dump -U postgres -d lab -f lab.sql"
+      ]
+    ],
+    "pg_restore": [
+      [
+        "-d",
+        "--dbname",
+        "復元先DB",
+        "復元するDBを指定。通常は先に復元先DBを用意する。",
+        "pg_restore -d backup_lab lab.dump"
+      ],
+      [
+        "-l",
+        "--list",
+        "目次表示",
+        "アーカイブの内容一覧を確認するだけ。まだ復元しない。",
+        "pg_restore -l lab.dump"
+      ],
+      [
+        "-L",
+        "--use-list",
+        "目次から選択",
+        "編集した目次ファイルで復元対象と順序を指定する。",
+        "pg_restore -L selected.list -d backup_lab lab.dump"
+      ],
+      [
+        "-t",
+        "--table",
+        "表指定",
+        "指定した表などを復元対象にする。依存するオブジェクトは別途確認。",
+        "pg_restore -t users -d backup_lab lab.dump"
+      ],
+      [
+        "-s",
+        "--schema-only",
+        "定義だけ",
+        "データを入れず、構造のみを復元する。",
+        "pg_restore -s -d backup_lab lab.dump"
+      ],
+      [
+        "-a",
+        "--data-only",
+        "データだけ",
+        "既存の表にデータなどを復元する。",
+        "pg_restore -a -d backup_lab lab.dump"
+      ],
+      [
+        "-j",
+        "--jobs",
+        "並列復元",
+        "複数作業で復元時間短縮を図る。カスタム・ディレクトリ形式に対応。",
+        "pg_restore -j 4 -d backup_lab lab.dump"
+      ],
+      [
+        "-e",
+        "--exit-on-error",
+        "エラーで停止",
+        "SQLエラー時に処理を中止する。以前に確定した変更は別。",
+        "pg_restore -e -d backup_lab lab.dump"
+      ],
+      [
+        "-c",
+        "--clean",
+        "既存を削除",
+        "復元対象の既存オブジェクトを先にDROPする。既存データが消えるため注意。",
+        "pg_restore -c -d backup_lab lab.dump"
+      ],
+      [
+        "-C",
+        "--create",
+        "DBも作る",
+        "バックアップに記録された名前のDBを作って復元する。-dは最初の接続先。",
+        "pg_restore -C -d postgres lab.dump"
+      ],
+      [
+        "-f",
+        "--file",
+        "SQL出力",
+        "復元用SQLなどをファイルへ出力する。DBへ直接復元する指定ではない。",
+        "pg_restore -f restore.sql lab.dump"
+      ]
+    ],
+    "pg_dumpall": [
+      [
+        "-f",
+        "--file",
+        "出力ファイル",
+        "クラスタ内全DBとグローバルオブジェクトをSQL形式で保存する。",
+        "pg_dumpall -f all.sql"
+      ],
+      [
+        "-g",
+        "--globals-only",
+        "共有情報のみ",
+        "ロール・表領域など、クラスタ共通の情報だけを保存する。",
+        "pg_dumpall -g -f globals.sql"
+      ],
+      [
+        "-r",
+        "--roles-only",
+        "ロールのみ",
+        "ロール情報だけ保存する。機密情報の保管に注意。",
+        "pg_dumpall -r -f roles.sql"
+      ],
+      [
+        "-s",
+        "--schema-only",
+        "定義のみ",
+        "データを含まず定義を出力する。",
+        "pg_dumpall -s -f schemas.sql"
+      ],
+      [
+        "-a",
+        "--data-only",
+        "データのみ",
+        "定義を含まずデータを出力する。",
+        "pg_dumpall -a -f data.sql"
+      ]
+    ],
+    "pg_basebackup": [
+      [
+        "-D",
+        "--pgdata",
+        "保存先",
+        "物理バックアップの保存先を指定。既存なら空のディレクトリが必要。",
+        "pg_basebackup -D /tmp/basebackup"
+      ],
+      [
+        "-X",
+        "--wal-method",
+        "WAL取得方法",
+        "stream（既定、同時受信）、fetch（最後に取得）、none（含めない）を選ぶ。復旧に必要なWALを確保すること。",
+        "pg_basebackup -D /tmp/basebackup -X stream"
+      ],
+      [
+        "-F",
+        "--format",
+        "保存形式",
+        "p=通常のディレクトリ形式（既定）、t=tar形式。pg_dumpの形式指定とは異なる。",
+        "pg_basebackup -D /tmp/basebackup -Ft"
+      ],
+      [
+        "-P",
+        "--progress",
+        "進捗表示",
+        "バックアップの進行状況を表示する。",
+        "pg_basebackup -D /tmp/basebackup -P"
+      ],
+      [
+        "-R",
+        "--write-recovery-conf",
+        "レプリカ設定",
+        "スタンバイ用の設定を作成する。PG12以降ではstandby.signalなどを作成。",
+        "pg_basebackup -D /tmp/basebackup -R"
+      ],
+      [
+        "-h",
+        "--host",
+        "接続先",
+        "バックアップ元のホストを指定する。",
+        "pg_basebackup -h localhost -D /tmp/basebackup"
+      ],
+      [
+        "-U",
+        "--username",
+        "DBユーザー",
+        "バックアップ接続に利用するロール。REPLICATION権限などが必要。",
+        "pg_basebackup -U postgres -D /tmp/basebackup"
+      ]
+    ],
+    "vacuumdb": [
+      [
+        "-d",
+        "--dbname",
+        "対象DB",
+        "保守対象のDBを指定。",
+        "vacuumdb -d lab"
+      ],
+      [
+        "-t",
+        "--table",
+        "対象表",
+        "保守対象を特定の表に絞る。",
+        "vacuumdb -d lab -t users"
+      ],
+      [
+        "-z",
+        "--analyze",
+        "VACUUM＋ANALYZE",
+        "不要領域を再利用できるようにし、検索方法を選ぶ統計も更新する。",
+        "vacuumdb -d lab -z"
+      ],
+      [
+        "-Z",
+        "--analyze-only",
+        "ANALYZEだけ",
+        "統計情報のみ更新。VACUUMはしない。",
+        "vacuumdb -d lab -Z"
+      ],
+      [
+        "-f",
+        "--full",
+        "VACUUM FULL",
+        "表を書き直して不要領域をOSに返す。強いロックが必要なので計画保守向け。",
+        "vacuumdb -d lab -f"
+      ],
+      [
+        "-a",
+        "--all",
+        "全DB",
+        "クラスタ内の接続可能なDBをまとめて保守する。",
+        "vacuumdb -a"
+      ],
+      [
+        "-j",
+        "--jobs",
+        "並列処理",
+        "複数の接続で複数の表を保守する。負荷に注意。",
+        "vacuumdb -d lab -j 2"
+      ]
+    ],
+    "initdb": [
+      [
+        "-D",
+        "--pgdata",
+        "保存先",
+        "新しいクラスタのデータディレクトリを指定する。",
+        "initdb -D /tmp/newpg"
+      ],
+      [
+        "-E",
+        "--encoding",
+        "文字コード",
+        "新しいクラスタの標準文字コードを設定する。",
+        "initdb -D /tmp/newpg -E UTF8"
+      ],
+      [
+        "-U",
+        "--username",
+        "管理ロール名",
+        "初期のDBスーパーユーザー名を指定する。OSユーザー名とは別。",
+        "initdb -D /tmp/newpg -U postgres"
+      ],
+      [
+        "-W",
+        "--pwprompt",
+        "パスワード入力",
+        "初期管理ロールのパスワードを対話入力する。",
+        "initdb -D /tmp/newpg -W"
+      ],
+      [
+        "-A",
+        "--auth",
+        "認証方式",
+        "初期のpg_hba.confの認証方法を指定。セキュリティ要件に応じて選ぶ。",
+        "initdb -D /tmp/newpg -A scram-sha-256 -W"
+      ],
+      [
+        "--locale",
+        "--locale",
+        "ロケール",
+        "文字の並び順や分類などの初期設定。OSで使えるロケールを指定する。",
+        "initdb -D /tmp/newpg --locale=C"
+      ]
+    ],
+    "pg_isready": [
+      [
+        "-h",
+        "--host",
+        "接続先",
+        "受付状態を調べるサーバーを指定。",
+        "pg_isready -h localhost"
+      ],
+      [
+        "-p",
+        "--port",
+        "ポート",
+        "確認するポート番号を指定する。",
+        "pg_isready -p 5432"
+      ],
+      [
+        "-d",
+        "--dbname",
+        "DB名",
+        "接続確認に使うDB名。正しいDB名でなくてもサーバーの状態は判別できる場合がある。",
+        "pg_isready -d lab"
+      ],
+      [
+        "-U",
+        "--username",
+        "ユーザー",
+        "接続確認時のDBユーザー名。",
+        "pg_isready -U postgres"
+      ],
+      [
+        "-t",
+        "--timeout",
+        "待ち時間",
+        "接続を待つ最大秒数。既定3秒。",
+        "pg_isready -t 5"
+      ],
+      [
+        "-q",
+        "--quiet",
+        "表示しない",
+        "メッセージを出さず終了コードで判断する。0=受付可、1=拒否、2=応答なし、3=試行なし。",
+        "pg_isready -q"
+      ]
+    ],
+    "createdb": [
+      [
+        "-T",
+        "--template",
+        "テンプレート",
+        "どのDBをひな形として新しいDBを作るか指定。",
+        "createdb -T template0 backup_lab"
+      ],
+      [
+        "-O",
+        "--owner",
+        "所有者",
+        "作成したDBの所有ロールを指定。",
+        "createdb -O postgres backup_lab"
+      ],
+      [
+        "-E",
+        "--encoding",
+        "文字コード",
+        "作成するDBの文字コードを指定。テンプレートとの整合性が必要。",
+        "createdb -T template0 -E UTF8 backup_lab"
+      ]
+    ],
+    "dropdb": [
+      [
+        "-i",
+        "--interactive",
+        "確認して削除",
+        "削除前に確認を促す。削除したDBは通常元に戻せない。",
+        "dropdb -i backup_lab"
+      ],
+      [
+        "--if-exists",
+        "--if-exists",
+        "存在時のみ",
+        "DBが存在しない場合をエラーにしない。",
+        "dropdb --if-exists backup_lab"
+      ]
+    ],
+    "createuser": [
+      [
+        "-P",
+        "--pwprompt",
+        "新ロールのパスワード",
+        "新しく作るロールのパスワードを入力する。",
+        "createuser -P trainee"
+      ],
+      [
+        "-s",
+        "--superuser",
+        "管理者権限",
+        "スーパーユーザーを作成する。通常のアプリ用ロールには付与しない。",
+        "createuser -s trainee"
+      ],
+      [
+        "-d",
+        "--createdb",
+        "DB作成権限",
+        "新ロールにDBを作る権限を与える。",
+        "createuser -d trainee"
+      ],
+      [
+        "-D",
+        "--no-createdb",
+        "DB作成不可",
+        "DB作成権限を与えない（既定）。",
+        "createuser -D trainee"
+      ]
+    ],
+    "dropuser": [
+      [
+        "-i",
+        "--interactive",
+        "確認して削除",
+        "対象ロールを削除する前に確認を促す。所有物や権限の依存関係に注意。",
+        "dropuser -i trainee"
+      ],
+      [
+        "--if-exists",
+        "--if-exists",
+        "存在時のみ",
+        "ロールが存在しない場合をエラーにしない。",
+        "dropuser --if-exists trainee"
+      ]
+    ],
+    "pg_resetwal": [
+      [
+        "-n",
+        "--dry-run",
+        "確認だけ",
+        "変更せず予定内容を表示する。通常運用では使用しない障害復旧ツール。",
+        "pg_resetwal -n /var/lib/postgresql/data"
+      ]
+    ],
+    "pg_config": [
+      [
+        "--version",
+        "--version",
+        "インストール版",
+        "ローカルに導入されたPostgreSQLの開発用情報から版を表示する。",
+        "pg_config --version"
+      ],
+      [
+        "--bindir",
+        "--bindir",
+        "実行ファイルの場所",
+        "PostgreSQLの実行ファイルのディレクトリを確認する。",
+        "pg_config --bindir"
+      ]
+    ]
+  },
+  "notes": {
+    "pg_ctl": "-w は完了待ち、-W は待たない。psqlでは同じ文字でも意味が違います。PGDATA設定済みの例では-Dを省略しています。",
+    "psql": "-d はDB名、-U はユーザー名。-w/-W はパスワード入力に関する指定です。",
+    "pg_dump": "-s は定義のみ、-a はデータのみ。-F の後の p/c/d/t で形式を指定します。",
+    "pg_restore": "-l は目次を表示、-L は目次ファイルを使う。-c は既存オブジェクト削除、-C はDB作成。",
+    "vacuumdb": "-z はVACUUMとANALYZE、-Z はANALYZEだけ。大文字小文字で意味が変わります。",
+    "pg_basebackup": "-D は物理バックアップの保存先。pg_ctl の -D は操作対象のデータディレクトリです。",
+    "createuser": "-d はDB作成権限を付与、-D は付与しない。psql の -d は接続先DBです。"
+  }
+};
+(function optionModule(){
+'use strict';
+const rows=window.OPTION_REFERENCE.data,notes=window.OPTION_REFERENCE.notes;
+function search(group,query){const q=query.trim();const terms=q.split(/\s+/).filter(Boolean);return Object.entries(rows).filter(([cmd])=>group==='all'||group===cmd).flatMap(([cmd,list])=>list.filter(r=>terms.every(t=>{if(t.startsWith('-'))return [r[0],...r[1].split(/\s*\/\s*/)].some(x=>x===t);return [cmd,...r].join(' ').toLowerCase().includes(t.toLowerCase())})).map(row=>({cmd,row})))}
+function mount(doc){
+ const $=id=>doc.getElementById(id),mode=$('refOptionMode'),command=$('refCommandMode'),group=$('optionGroup'),query=$('optionSearch'),list=$('optionList');
+ for(const cmd of Object.keys(rows)){const o=doc.createElement('option');o.value=cmd;o.textContent=cmd;group.append(o)}
+ function render(){list.replaceChildren();const found=search(group.value||'all',query.value);$('optionCount').textContent=found.length+' 件';const note=notes[group.value];$('optionNote').hidden=!note;$('optionNote').textContent=note||'';if(!found.length){list.textContent='該当するオプションがありません。';return}let previous='';for(const {cmd,row:r} of found){if(cmd!==previous){const h=doc.createElement('h3');h.className='option-heading';h.textContent=cmd;list.append(h);previous=cmd}const d=doc.createElement('div');d.className='option-entry';const title=doc.createElement('strong');title.textContent=r[0]+'　'+r[2];const alias=doc.createElement('small');alias.textContent=r[1]===r[0]?'':r[1];const p=doc.createElement('p');p.textContent=r[3];const example=doc.createElement('code');example.textContent=r[4];d.append(title,alias,p,example);list.append(d)}}
+ function toggle(on){$('commandReference').hidden=on;$('optionReference').hidden=!on;mode.setAttribute('aria-pressed',String(on));command.setAttribute('aria-pressed',String(!on));if(on)render()}
+ mode.onclick=()=>toggle(true);command.onclick=()=>toggle(false);group.onchange=render;query.oninput=render;toggle(false);return{render,toggle};
+}
+window.OptionReference={search,mount};
+})();
+
 /* UI / progress / real PostgreSQL adapter */
 (()=>{'use strict';const L=window.LESSONS,$=id=>document.getElementById(id);const KEY='ossdb-lab-progress-v1';let done=new Set();try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(x))done=new Set(x)}catch{};let admin,db,expected,locked=false,history='',sqlLoaded=false,practice=false,engine='';
 const scope=t=>L.adminScope?.[t[0]]||'';
@@ -1133,7 +1865,7 @@ $('mockStart').onclick=startMock;$('mockRestart').onclick=startMock;$('mockPrev'
 function refs(){const q=$('searchRef').value.toLowerCase().trim(),e=$('refList');e.replaceChildren();const extra=[['postgresql.conf','サーバー設定。shared_buffers、port など。'],['pg_hba.conf','クライアント認証。接続元・DB・ユーザー・認証方式。'],['pg_ident.conf','OSユーザー名とDBユーザー名のマッピング。'],['WAL','Write-Ahead Logging。データページより先にログを永続化。'],['\\d','リレーション一覧（テーブル・ビュー・シーケンス等）。'],['VACUUM FULL','テーブルを書き直し、領域をOSへ返せる。排他ロックに注意。'],['SELECT nextval(\'users_id_seq\');','シーケンスを進めて値を取得。実際のシーケンス名を指定。']];const rows=[...L.admin.map(t=>[t[4],t[1]+' / '+t[5]+(scope(t)?' / '+scope(t):'')+usage(t),t[6]]),...extra];for(const r of rows){if(!r.join(' ').toLowerCase().includes(q))continue;const d=document.createElement('div');d.className='refItem';const c=document.createElement('code');c.textContent=r[0];const s=document.createElement('small');s.textContent=(r[2]?r[2]+' · ':'')+r[1];d.append(c,s);e.append(d)}if(!e.children.length)e.textContent='該当するコマンドがありません。'}$('searchRef').oninput=refs;
 // SQL runs in a dedicated worker, keeping the mobile UI responsive.
 function setBusy(v){locked=v;$('runSQL').disabled=v;$('resetSQL').disabled=v||!(sqlLoaded||practice);$('practiceSQL').disabled=v;$('sqlSelect').disabled=v;$('sqlNext').disabled=v;$('sqlNextBottom').disabled=v;$('connect').disabled=v;$('sqliteConnect').disabled=v}
-function createClient(){const worker=new Worker('./sql-worker.js?v=2.5');let seq=0,pending=new Map(),closed=false;
+function createClient(){const worker=new Worker('./sql-worker.js?v=2.6');let seq=0,pending=new Map(),closed=false;
  function fail(reason){if(closed)return;closed=true;worker.terminate();for(const p of pending.values()){clearTimeout(p.timer);p.reject(new Error(reason))}pending.clear()}
  worker.onmessage=e=>{const m=e.data,p=pending.get(m.id);if(!p)return;pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(new Error(m.error)):p.resolve(m.result)};
  worker.onerror=e=>fail(e.message||'SQLワーカーの起動に失敗');
@@ -1163,7 +1895,7 @@ for(const b of document.querySelectorAll('[data-sql-insert]')){b.addEventListene
 function drawResults(results){const out=$('sqlOutput');out.replaceChildren();for(const r of results){if(r.fields?.length){const table=document.createElement('table');const thead=table.createTHead().insertRow();for(const f of r.fields){const th=document.createElement('th');th.textContent=f.name;thead.append(th)}const body=table.createTBody();for(const row of r.rows.slice(0,200)){const tr=body.insertRow();for(const f of r.fields){const td=tr.insertCell();const v=row[f.name];td.textContent=v===null?'NULL':typeof v==='object'?JSON.stringify(v):String(v)}}out.append(table);const n=document.createElement('p');n.textContent=`${r.rows.length} 行${r.rows.length>200?'（先頭200行表示）':''}`;out.append(n)}else{const p=document.createElement('pre');p.textContent=`実行成功${r.affectedRows!==undefined?' / 影響行数: '+r.affectedRows:''}`;out.append(p)}}}
 $('runSQL').onclick=async()=>{if(locked)return;const raw=$('sqlInput').value.trim(),q=window.SQLPractice.normalize(raw),t=current('sql');if(!q){msg('sqlFeedback','SQLを入力してください。',false);return}if(!(sqlLoaded||practice)){const started=await connectEngine('postgres',true);if(!started){msg('sqlFeedback','実際のSQLは実行できませんでした。解答チェックを使う場合はもう一度押してください。',false);return}}if(practice){const ok=window.SQLPractice.matches(q,t[4]);record(t[0],ok);if(ok){mark(t[0]);msg('sqlFeedback','正解！ 模範解答と一致しました（SQL未実行）。',true);$('sqlHelp').hidden=true;explain('sql',t)}else msg('sqlFeedback','模範解答と一致しません。別の正しい書き方も判定できないことがあります。ヒントを確認してください。',false);return}setBusy(true);msg('sqlFeedback');try{const r=await db.exec(q);drawResults(r);const verify=verification(t),actual=signature(verify?await db.exec(verify):r,t[5]||!!verify);const hasTransaction=t[7]!=='rollback'||(/\bbegin\b/i.test(q)&&/\bupdate\b/i.test(q)&&/\brollback\b/i.test(q));const required=t[7]==='commit'?(/\bbegin\b/i.test(q)&&/\bupdate\b/i.test(q)&&/\bcommit\b/i.test(q)):t[7]==='returning'?/\breturning\b/i.test(q):t[7]==='insert-select'?/\binsert\s+into\b[\s\S]*\bselect\b/i.test(q):true;const passed=actual===expected&&hasTransaction&&required;record(t[0],passed);if(passed){mark(t[0]);msg('sqlFeedback','正解！ 実行結果が期待値と一致しました。',true);$('sqlHelp').hidden=true;explain('sql',t)}else msg('sqlFeedback','実行できましたが、課題の期待値とは一致しません。条件や列を確認してください。更新系はDB初期化して再挑戦できます。',false)}catch(e){record(t[0],false);if(db?.closed){sqlLoaded=false;$('sqlStatus').textContent='エンジン停止';}msg('sqlFeedback','SQLエラー：'+e.message+'\nトランザクションが中断された場合は ROLLBACK; またはDB初期化。',false)}finally{setBusy(false)}};
 $('schema').textContent='users (id integer PK, name text, age integer, dept text, email text)\norders (id integer PK, user_id integer FK → users.id, amount integer)';const schemaPre=document.createElement('pre');schemaPre.textContent='\nusers: id | name | age | dept | email\n1 | Sato | 31 | IT | sato@example.test\n2 | Suzuki | 25 | IT | NULL\n3 | Tanaka | 40 | Sales | tanaka@example.test\n4 | Yamada | 35 | Sales | NULL\n5 | Kato | 22 | HR | kato@example.test\n\norders: id | user_id | amount\n1 | 1 | 1200\n2 | 1 | 800\n3 | 2 | 500\n4 | 3 | 3000\n5 | 4 | 1500';$('schema').append(schemaPre);
-adminTask();sqlTask();quizTask();refs();progress();renderStats();$('startupNotice').hidden=true;
+adminTask();sqlTask();quizTask();refs();window.OptionReference.mount(document);progress();renderStats();$('startupNotice').hidden=true;
 if(location.protocol==='https:'&&'serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{$('offlineStatus').textContent='基本機能をオフライン保存済み（SQL実行は通信が必要な場合あり）。'}).catch(()=>{$('offlineStatus').textContent='オフライン保存に失敗。オンラインで使用できます。'})}else $('offlineStatus').textContent='GitHub Pagesで公開すると基本機能をオフライン保存できます。';
 })();
 
