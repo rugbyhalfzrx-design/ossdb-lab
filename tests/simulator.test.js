@@ -19,6 +19,6 @@ assert(extended.run('createuser trainee').ok);assert(extended.roles.has('trainee
 assert(extended.run('pg_isready -p 5432').text.includes('exit: 0'));assert(extended.run('pg_ctl -D /var/lib/postgresql/data stop').ok);assert(extended.run('pg_isready -p 5432').text.includes('exit: 2'));
 assert(!extended.run('pg_resetwal -f /var/lib/postgresql/data').ok);assert(extended.run('pg_resetwal -n /var/lib/postgresql/data').ok);
 assert(extended.run('pg_ctl -D /var/lib/postgresql/data -l server.log start').ok);assert(extended.files.has('server.log'));
-assert.equal(Object.keys(LESSONS.adminScope).length,10);
+assert.equal(Object.keys(LESSONS.adminScope).length,13);
 
-assert.equal(LESSONS.admin.length,110);assert.equal(LESSONS.sql.length,80);assert.equal(LESSONS.quiz.length,240);
+assert.equal(LESSONS.admin.length,114);assert.equal(LESSONS.sql.length,80);assert.equal(LESSONS.quiz.length,240);
